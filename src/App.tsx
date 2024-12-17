@@ -24,14 +24,9 @@ import { Header } from "./components/header";
 import { API_URL } from "./constants";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { BookingCreate, BookingList, BookingShow } from "./pages/bookings";
-import { RoomCreate, RoomList } from "./pages/rooms";
 import { UserCreate, UserList, UserShow } from "./pages/user";
-import {
-  GroupRoomCreate,
-  GroupRoomList,
-  GroupRoomShow,
-} from "./pages/room-groups";
 import { DataProvider } from "./dataProvider";
+import { SpaceCreate, SpaceList, SpaceShow } from "./pages/spaces";
 
 function App() {
   return (
@@ -58,35 +53,15 @@ function App() {
                     },
                   },
                   {
-                    name: "rooms",
-                    list: "/rooms",
-                    create: "/rooms/create",
-                    edit: "/rooms/edit/:id",
-                    show: "/rooms/show/:id",
+                    name: "spaces",
+                    list: "/spaces",
+                    create: "/spaces/create",
+                    edit: "/spaces/edit/:id",
+                    show: "/spaces/show/:id",
                     meta: {
                       canDelete: true,
                     },
                   },
-                  {
-                    name: "room-groups",
-                    list: "/room-groups",
-                    create: "/room-groups/create",
-                    edit: "/room-groups/edit/:id",
-                    show: "/room-groups/show/:id",
-                    meta: {
-                      canDelete: true,
-                    },
-                  },
-                  // {
-                  //   name: "seats",
-                  //   list: "/seats",
-                  //   create: "/seats/create",
-                  //   edit: "/seats/edit/:id",
-                  //   show: "/seats/show/:id",
-                  //   meta: {
-                  //     canDelete: true,
-                  //   },
-                  // },
                   {
                     name: "bookings",
                     list: "/bookings",
@@ -131,21 +106,13 @@ function App() {
                       <Route path="edit/:id" element={<BookingCreate />} />
                       <Route path="show/:id" element={<BookingShow />} />
                     </Route>
-                    <Route path="/rooms">
-                      <Route index element={<RoomList />} />
-                      <Route path="create" element={<RoomCreate />} />
-                      <Route path="edit/:id" element={<RoomCreate />} />
-                      <Route
-                        path="show/:id"
-                        element={<RoomCreate disabled />}
-                      />
+                    <Route path="/spaces">
+                      <Route index element={<SpaceList />} />
+                      <Route path="create" element={<SpaceCreate />} />
+                      <Route path="edit/:id" element={<SpaceCreate />} />
+                      <Route path="show/:id" element={<SpaceShow />} />
                     </Route>
-                    <Route path="/room-groups">
-                      <Route index element={<GroupRoomList />} />
-                      <Route path="create" element={<GroupRoomCreate />} />
-                      <Route path="edit/:id" element={<GroupRoomCreate />} />
-                      <Route path="show/:id" element={<GroupRoomShow />} />
-                    </Route>
+
                     <Route path="/users">
                       <Route index element={<UserList />} />
                       <Route path="create" element={<UserCreate />} />

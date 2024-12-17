@@ -26,7 +26,7 @@ export const UserList = () => {
         <Table.Column
           dataIndex={["avatar"]}
           title="Avatar"
-          render={(r) => <Avatar src={API_URL + r.url} />}
+          render={(r) => <Avatar src={API_URL + r?.url} />}
         />
         <Table.Column dataIndex="username" title={"Username"} />
         <Table.Column dataIndex="email" title={"Email"} />

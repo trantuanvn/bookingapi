@@ -4,7 +4,7 @@ import { Typography } from "antd";
 
 const { Title } = Typography;
 
-export const GroupRoomShow = () => {
+export const SpaceShow = () => {
   const { query } = useShow({
     meta: {
       populate: ["category"],

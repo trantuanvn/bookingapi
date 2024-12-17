@@ -2,7 +2,7 @@ import { Create, useForm, useSelect } from "@refinedev/antd";
 import { Form, Input, Select } from "antd";
 import UploadFile from "../../components/image";
 
-export const GroupRoomCreate = () => {
+export const SpaceCreate = () => {
   const { formProps, saveButtonProps } = useForm({});
 
   return (
