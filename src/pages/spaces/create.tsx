@@ -36,7 +36,7 @@ export const SpaceCreate = () => {
           <Input.TextArea />
         </Form.Item>
 
-        <Form.Item
+        {/* <Form.Item
           label={"Hình ảnh"}
           name={["image"]}
           rules={[
@@ -46,10 +46,10 @@ export const SpaceCreate = () => {
           ]}
         >
           <UploadFile />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item
-          label={"Chiều dài"}
+          label={"Chiều dài (cm)"}
           name={["height"]}
           rules={[
             {
@@ -61,7 +61,7 @@ export const SpaceCreate = () => {
         </Form.Item>
 
         <Form.Item
-          label={"Chiều rộng"}
+          label={"Chiều rộng (cm)"}
           name={["width"]}
           rules={[
             {

@@ -4,7 +4,13 @@ import { get } from "lodash";
 // import nookies from "nookies";
 import { API_URL, TOKEN_KEY } from "../constants";
 
-export default function UploadFile({ value, onChange, multiple }: any) {
+export default function UploadFile({
+  value,
+  onChange,
+  multiple,
+  children,
+  onDone,
+}: any) {
   // const cookies = nookies.get();
   const fileList: any[] = [];
 
@@ -36,7 +42,7 @@ export default function UploadFile({ value, onChange, multiple }: any) {
         action={`${API_URL}/api/upload`}
         listType="picture"
         headers={{
-          Authorization: "Bearer " + localStorage.getItem(TOKEN_KEY), 
+          Authorization: "Bearer " + localStorage.getItem(TOKEN_KEY),
         }}
         multiple={multiple}
         showUploadList={false}
@@ -50,19 +56,27 @@ export default function UploadFile({ value, onChange, multiple }: any) {
                 .filter((r: any) => r.response)
                 .map((i: any) => i.response[0]);
               onChange && onChange(out);
+              if (out.length > 0) {
+                onDone && onDone(out);
+              }
             }
             return;
           } else {
             const v = get(e, "file.response[0]");
             if (v) {
               onChange && onChange(v);
+              onDone && onDone(v);
             }
           }
         }}
       >
-        <p style={{ minWidth: 60 }} className="ant-upload-text">
-          + Ảnh
-        </p>
+        {children ? (
+          children
+        ) : (
+          <p style={{ minWidth: 60 }} className="ant-upload-text">
+            + Ảnh
+          </p>
+        )}
       </Upload.Dragger>
 
       {fileList.map((f) => (
