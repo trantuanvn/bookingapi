@@ -31,10 +31,12 @@ import {
 import { useParams } from "react-router-dom";
 import UploadFile from "../../components/image";
 import { API_URL } from "../../constants";
+import { useState } from "react";
 
 const { Title } = Typography;
 
 export const SpaceShow = () => {
+  const [zoom, setZoom] = useState(1);
   const { id } = useParams();
   const { query } = useShow({
     meta: {
@@ -89,7 +91,20 @@ export const SpaceShow = () => {
   return (
     <Show breadcrumb={null} title="Chi tiết khu vực" headerButtons={[]}>
       <Card
-        title="Bản đồ"
+        title={
+          <Space>
+            <Title level={4}>{data.name}</Title>
+            <Button onClick={() => setZoom(zoom - 0.01)}>-</Button>
+            <InputNumber
+              value={Math.round(zoom * 100)}
+              suffix="%"
+              onChange={(value) => {
+                setZoom(value / 100);
+              }}
+            />
+            <Button onClick={() => setZoom(zoom + 0.01)}>+</Button>
+          </Space>
+        }
         extra={
           <Space>
             <UploadFile
@@ -114,17 +129,19 @@ export const SpaceShow = () => {
         }
       >
         <div
+          id="space"
           style={{
             overflow: "auto",
           }}
         >
           <div
             style={{
-              width: data.width / 10 + "px",
-              height: data.height / 10 + "px",
+              width: data.width * zoom + "px",
+              height: data.height * zoom + "px",
               backgroundImage: `url(${bg})`,
               backgroundRepeat: "no-repeat",
               backgroundColor: "yellow",
+              backgroundSize: "100% auto",
               position: "relative",
             }}
           >
@@ -139,51 +156,57 @@ export const SpaceShow = () => {
                   id={`workspace-${workspace.id}`}
                   style={{
                     position: "absolute",
-                    left: workspace.positionX / 10 + "px",
-                    top: workspace.positionY / 10 + "px",
-                    width: workspace.width / 10 + "px",
-                    height: workspace.height / 10 + "px",
-                    background: () => {
-                      if (workspace.type === "seat") {
-                        return "red";
-                      }
-                      if (workspace.type === "meeting_room") {
-                        return "blue";
-                      }
-                      if (workspace.type === "room") {
-                        return "green";
-                      }
-                      return "black";
-                    },
-                    opacity: 0.5,
+                    left: workspace.positionX * zoom + "px",
+                    top: workspace.positionY * zoom + "px",
+                    width: workspace.width * zoom + "px",
+                    height: workspace.height * zoom + "px",
+                    background:
+                      workspace.type === "seat"
+                        ? "red"
+                        : workspace.type === "meeting_room"
+                        ? "blue"
+                        : workspace.type === "room"
+                        ? "green"
+                        : "black",
+                    opacity: 0.6,
                   }}
                   draggable
                   onDrag={(ev: any) => {
                     let el = document.getElementById(
                       `workspace-${workspace.id}`
                     );
-                    var x = ev.clientX;
-                    var y = ev.clientY;
+                    var offsets = document
+                      .getElementById("space")
+                      .getBoundingClientRect();
+                    var top = offsets.top;
+                    var left = offsets.left;
                     if (el) {
-                      el.style.left = x + "px";
-                      el.style.top = y + "px";
+                      el.style.left = ev.clientX - left + "px";
+                      el.style.top = ev.clientY - top + "px";
+                      console.log(el.style.left, el.style.top);
                     }
                   }}
                   onDragEnd={(e) => {
                     let el = document.getElementById(
                       `workspace-${workspace.id}`
                     );
-                    var x = e.clientX;
-                    var y = e.clientY;
-
-                    mutateUpdate({
-                      resource: "work-spaces",
-                      id: workspace.documentId,
-                      values: {
-                        positionX: x * 10,
-                        positionY: y * 10,
-                      },
-                    });
+                    var offsets = document
+                      .getElementById("space")
+                      .getBoundingClientRect();
+                    var top = offsets.top;
+                    var left = offsets.left;
+                    const x = e.clientX - left;
+                    const y = e.clientY - top;
+                    if (el) {
+                      mutateUpdate({
+                        resource: "work-spaces",
+                        id: workspace.documentId,
+                        values: {
+                          positionX: x / zoom,
+                          positionY: y / zoom,
+                        },
+                      });
+                    }
                   }}
                 ></div>
               );
