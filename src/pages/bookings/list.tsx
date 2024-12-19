@@ -18,7 +18,8 @@ export const BookingList = () => {
   return (
     <List canCreate={false}>
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="id" title={"ID"} />
+        {/* <Table.Column dataIndex="id" title={"ID"} /> */}
+        <Table.Column dataIndex="code" title={"Code"} />
         <Table.Column dataIndex="title" title={"User"} />
         <Table.Column dataIndex="title" title={"Space / Workspace"} />
         <Table.Column dataIndex="title" title={"Date"} />
@@ -28,10 +29,10 @@ export const BookingList = () => {
         <Table.Column
           title={"Actions"}
           dataIndex="actions"
-          render={(_, record: BaseRecord) => (
+          render={(_, record: any) => (
             <Space>
               {/* <EditButton hideText size="small" recordItemId={record.id} /> */}
-              <ShowButton hideText size="small" recordItemId={record.id} />
+              <ShowButton hideText size="small" recordItemId={record.code} />
               {/* <DeleteButton hideText size="small" recordItemId={record.id} /> */}
             </Space>
           )}

@@ -1,22 +1,20 @@
 import { DateField, MarkdownField, Show, TextField } from "@refinedev/antd";
 import { useOne, useShow } from "@refinedev/core";
-import { Typography } from "antd";
+import { Card, Typography } from "antd";
 
 const { Title } = Typography;
 
 export const BookingShow = () => {
   const { query } = useShow({
     meta: {
-      populate: ["category"],
+      populate: ["user", "work-space"],
     },
   });
   const { data, isLoading } = query;
 
-  const record = data?.data;
-
   return (
     <Show isLoading={isLoading} breadcrumb={false} headerButtons={[]}>
-     
+      <Card title="Booking Details"></Card>
     </Show>
   );
 };
