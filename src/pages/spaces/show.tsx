@@ -99,7 +99,7 @@ export const SpaceShow = () => {
               value={Math.round(zoom * 100)}
               suffix="%"
               onChange={(value) => {
-                setZoom(value / 100);
+                setZoom((value || 0) / 100);
               }}
             />
             <Button onClick={() => setZoom(zoom + 0.01)}>+</Button>
@@ -177,9 +177,9 @@ export const SpaceShow = () => {
                     );
                     var offsets = document
                       .getElementById("space")
-                      .getBoundingClientRect();
-                    var top = offsets.top;
-                    var left = offsets.left;
+                      ?.getBoundingClientRect();
+                    var top = offsets?.top || 0;
+                    var left = offsets?.left || 0;
                     if (el) {
                       el.style.left = ev.clientX - left + "px";
                       el.style.top = ev.clientY - top + "px";
@@ -192,9 +192,9 @@ export const SpaceShow = () => {
                     );
                     var offsets = document
                       .getElementById("space")
-                      .getBoundingClientRect();
-                    var top = offsets.top;
-                    var left = offsets.left;
+                      ?.getBoundingClientRect();
+                    var top = offsets?.top || 0;
+                    var left = offsets?.left || 0;
                     const x = e.clientX - left;
                     const y = e.clientY - top;
                     if (el) {

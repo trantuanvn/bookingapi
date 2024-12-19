@@ -19,7 +19,11 @@ export const BookingList = () => {
     <List>
       <Table {...tableProps} rowKey="id">
         <Table.Column dataIndex="id" title={"ID"} />
-        <Table.Column dataIndex="title" title={"Title"} />
+        <Table.Column dataIndex="title" title={"User"} />
+        <Table.Column dataIndex="title" title={"Space / Workspace"} />
+        <Table.Column dataIndex="title" title={"Date"} />
+        <Table.Column dataIndex="title" title={"Time"} />
+        <Table.Column dataIndex="title" title={"Type"} />
 
         <Table.Column
           title={"Actions"}
