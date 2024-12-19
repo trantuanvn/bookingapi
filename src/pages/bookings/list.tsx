@@ -32,7 +32,11 @@ export const BookingList = () => {
           render={(_, record: any) => (
             <Space>
               {/* <EditButton hideText size="small" recordItemId={record.id} /> */}
-              <ShowButton hideText size="small" recordItemId={record.code} />
+              <ShowButton
+                hideText
+                size="small"
+                recordItemId={record.documentId}
+              />
               {/* <DeleteButton hideText size="small" recordItemId={record.id} /> */}
             </Space>
           )}
