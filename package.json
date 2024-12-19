@@ -41,7 +41,8 @@
     "dev": "refine dev",
     "build": "tsc && refine build",
     "start": "refine start  --port=3000 --host",
-    "refine": "refine"
+    "refine": "refine",
+    "deploy": "git pull && npm run build && pm2 restart start.sh"
   },
   "browserslist": {
     "production": [
