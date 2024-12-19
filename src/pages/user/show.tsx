@@ -15,7 +15,7 @@ export const UserShow = () => {
   const record = data?.data;
 
   const { tableProps: tablePropsSubsciption } = useTable({
-    resource: "subscription",
+    resource: "subscriptions",
     filters: {
       permanent: [
         {
