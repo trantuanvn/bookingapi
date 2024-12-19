@@ -15,18 +15,8 @@ export const BookingShow = () => {
   const record = data?.data;
 
   return (
-    <Show isLoading={isLoading}>
-      <Title level={5}>{"ID"}</Title>
-      <TextField value={record?.id} />
-      <Title level={5}>{"Title"}</Title>
-      <TextField value={record?.title} />
-      <Title level={5}>{"Content"}</Title>
-      <MarkdownField value={record?.content} />
-      <Title level={5}>{"Category"}</Title>
-      <Title level={5}>{"Status"}</Title>
-      <TextField value={record?.status} />
-      <Title level={5}>{"CreatedAt"}</Title>
-      <DateField value={record?.createdAt} />
+    <Show isLoading={isLoading} breadcrumb={false} headerButtons={[]}>
+     
     </Show>
   );
 };

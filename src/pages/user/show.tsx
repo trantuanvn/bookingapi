@@ -41,7 +41,7 @@ export const UserShow = () => {
   });
 
   return (
-    <Show breadcrumb={null} isLoading={isLoading}>
+    <Show breadcrumb={null} isLoading={isLoading} headerButtons={[]}>
       {record && (
         <Card title="Thông tin">
           <Form

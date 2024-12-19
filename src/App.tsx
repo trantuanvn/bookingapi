@@ -157,11 +157,11 @@ function App() {
                   </Route>
                 </Routes>
 
-                <RefineKbar />
-                <UnsavedChangesNotifier />
-                <DocumentTitleHandler />
+                {/* <RefineKbar /> */}
+                {/* <UnsavedChangesNotifier /> */}
+                {/* <DocumentTitleHandler /> */}
               </Refine>
-              <DevtoolsPanel />
+              {/* <DevtoolsPanel /> */}
             </DevtoolsProvider>
           </AntdApp>
         </ColorModeContextProvider>
