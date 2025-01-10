@@ -18,10 +18,12 @@ import {
 import {
   Button,
   Card,
+  Col,
   Form,
   Input,
   InputNumber,
   Modal,
+  Row,
   Select,
   Space,
   Table,
@@ -32,6 +34,7 @@ import { useParams } from "react-router-dom";
 import UploadFile from "../../components/image";
 import { API_URL } from "../../constants";
 import { useState } from "react";
+import { SaveOutlined, UploadOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -69,11 +72,12 @@ export const SpaceShow = () => {
         name: "Seat",
         code: "SEAT_1",
         space: data.id,
-        width: 200,
-        height: 200,
+        width: 2,
+        height: 2,
         positionX: 0,
         positionY: 0,
         type: "seat",
+        pricePerHour: 10, // 10USD per hour
       },
     });
   };
@@ -92,9 +96,13 @@ export const SpaceShow = () => {
     <Show breadcrumb={null} title="Chi tiết khu vực" headerButtons={[]}>
       <Card
         title={
-          <Space>
-            <Title level={4}>{data.name}</Title>
-            <Button onClick={() => setZoom(zoom - 0.01)}>-</Button>
+          <Space size="small">
+            <Title level={5} style={{ margin: 0, marginRight: 24 }}>
+              {data.name}
+            </Title>
+            <Button size="small" onClick={() => setZoom(zoom - 0.01)}>
+              -
+            </Button>
             <InputNumber
               value={Math.round(zoom * 100)}
               suffix="%"
@@ -102,7 +110,9 @@ export const SpaceShow = () => {
                 setZoom((value || 0) / 100);
               }}
             />
-            <Button onClick={() => setZoom(zoom + 0.01)}>+</Button>
+            <Button size="small" onClick={() => setZoom(zoom + 0.01)}>
+              +
+            </Button>
           </Space>
         }
         extra={
@@ -116,7 +126,7 @@ export const SpaceShow = () => {
                 });
               }}
             >
-              Hình nền
+              <Button icon={<UploadOutlined />}>Hình nền</Button>
             </UploadFile>
             <Button
               onClick={() => {
@@ -136,8 +146,8 @@ export const SpaceShow = () => {
         >
           <div
             style={{
-              width: data.width * zoom + "px",
-              height: data.height * zoom + "px",
+              width: data.width * 100 * zoom + "px",
+              height: data.height * 100 * zoom + "px",
               backgroundImage: `url(${bg})`,
               backgroundRepeat: "no-repeat",
               backgroundColor: "yellow",
@@ -150,16 +160,15 @@ export const SpaceShow = () => {
                 <div
                   key={workspace.id}
                   onClick={() => {
-                    console.log(workspace);
                     show(workspace.documentId);
                   }}
                   id={`workspace-${workspace.id}`}
                   style={{
                     position: "absolute",
-                    left: workspace.positionX * zoom + "px",
-                    top: workspace.positionY * zoom + "px",
-                    width: workspace.width * zoom + "px",
-                    height: workspace.height * zoom + "px",
+                    left: workspace.positionX * 100 * zoom + "px",
+                    top: workspace.positionY * 100 * zoom + "px",
+                    width: workspace.width * 100 * zoom + "px",
+                    height: workspace.height * 100 * zoom + "px",
                     background:
                       workspace.type === "seat"
                         ? "red"
@@ -202,8 +211,8 @@ export const SpaceShow = () => {
                         resource: "work-spaces",
                         id: workspace.documentId,
                         values: {
-                          positionX: x / zoom,
-                          positionY: y / zoom,
+                          positionX: x / 100 / zoom,
+                          positionY: y / 100 / zoom,
                         },
                       });
                     }
@@ -287,56 +296,78 @@ export const SpaceShow = () => {
               });
             }}
           >
-            <Form.Item
-              label={"Tên khu vực"}
-              name={["name"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label={"Tên khu vực"}
+                  name={["name"]}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
 
-            <Form.Item
-              label={"Mô tả"}
-              name={["description"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Input.TextArea />
-            </Form.Item>
+              <Col span={12}>
+                <Form.Item
+                  label={"Mã khu vực"}
+                  name={["code"]}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
 
-            <Form.Item
-              label={"Chiều dài"}
-              name={["height"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <InputNumber />
-            </Form.Item>
+              <Col span={12}>
+                <Form.Item
+                  label={"Chiều ngang (m)"}
+                  name={["width"]}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <InputNumber />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label={"Chiều dọc (m)"}
+                  name={["height"]}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <InputNumber />
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <Form.Item
+                  label={"Mô tả"}
+                  name={["description"]}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input.TextArea />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            <Form.Item
-              label={"Chiều rộng"}
-              name={["width"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <InputNumber />
-            </Form.Item>
-
-            <Button type="primary" htmlType="submit">
-              Lưu
+            <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
+              Lưu thay đổi
             </Button>
           </Form>
         </Card>

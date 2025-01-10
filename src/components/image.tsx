@@ -37,7 +37,10 @@ export default function UploadFile({
   }
   return (
     <div>
-      <Upload.Dragger
+      <Upload
+        style={{
+          height: 20,
+        }}
         name="files"
         action={`${API_URL}/api/upload`}
         listType="picture"
@@ -77,7 +80,7 @@ export default function UploadFile({
             + Ảnh
           </p>
         )}
-      </Upload.Dragger>
+      </Upload>
 
       {fileList.map((f) => (
         <div key={f.uid}>

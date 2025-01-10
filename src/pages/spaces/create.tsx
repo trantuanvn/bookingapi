@@ -36,18 +36,6 @@ export const SpaceCreate = () => {
           <Input.TextArea />
         </Form.Item>
 
-        {/* <Form.Item
-          label={"Hình ảnh"}
-          name={["image"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <UploadFile />
-        </Form.Item> */}
-
         <Form.Item
           label={"Chiều dài (cm)"}
           name={["height"]}
