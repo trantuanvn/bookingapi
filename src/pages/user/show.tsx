@@ -19,7 +19,7 @@ export const UserShow = () => {
     filters: {
       permanent: [
         {
-          field: "user.documentId",
+          field: "user.id",
           operator: "eq",
           value: record?.id,
         },

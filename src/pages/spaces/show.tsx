@@ -156,6 +156,12 @@ export const SpaceShow = () => {
             }}
           >
             {workspaces.map((workspace) => {
+              const colors: any = {
+                seat: "red",
+                meeting_room: "blue",
+                conference_room: "green",
+                lounge: "yellow",
+              };
               return (
                 <div
                   key={workspace.id}
@@ -169,14 +175,7 @@ export const SpaceShow = () => {
                     top: workspace.positionY * 100 * zoom + "px",
                     width: workspace.width * 100 * zoom + "px",
                     height: workspace.height * 100 * zoom + "px",
-                    background:
-                      workspace.type === "seat"
-                        ? "red"
-                        : workspace.type === "meeting_room"
-                        ? "blue"
-                        : workspace.type === "room"
-                        ? "green"
-                        : "black",
+                    background: colors[workspace.type] ?? "black",
                     opacity: 0.6,
                   }}
                   draggable
@@ -227,7 +226,24 @@ export const SpaceShow = () => {
       <Card title={"Thông tin workspace"}>
         <Table dataSource={workspaces}>
           <Table.Column dataIndex="name" title={"Tên"} />
-          <Table.Column dataIndex="type" title={"Type"} />
+          <Table.Column
+            dataIndex="type"
+            title={"Type"}
+            render={(text) => {
+              switch (text) {
+                case "seat":
+                  return "Bàn";
+                case "meeting_room":
+                  return "Phòng họp";
+                case "conference_room":
+                  return "Phòng hội nghị";
+                case "lounge":
+                  return "Phòng chờ";
+                default:
+                  return text;
+              }
+            }}
+          />
           <Table.Column dataIndex="code" title={"Code"} />
           <Table.Column dataIndex="positionX" title={"X"} />
           <Table.Column dataIndex="positionY" title={"Y"} />
@@ -380,9 +396,12 @@ export const SpaceShow = () => {
           </Form.Item>
           <Form.Item label="Type" name="type">
             <Select>
-              <Select.Option value="seat">Seat</Select.Option>
-              <Select.Option value="meeting_room">Meeting room</Select.Option>
-              <Select.Option value="room">Room</Select.Option>
+              <Select.Option value="seat">Bàn</Select.Option>
+              <Select.Option value="meeting_room">ng họp</Select.Option>
+              <Select.Option value="conference_room">
+                Phòng hội nghị
+              </Select.Option>
+              <Select.Option value="lounge">Phòng chờ</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item label="Code" name="code">
