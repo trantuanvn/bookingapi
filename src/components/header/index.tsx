@@ -8,7 +8,7 @@ import {
   theme,
   Typography,
 } from "antd";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { ColorModeContext } from "../../contexts/color-mode";
 
 const { Text } = Typography;
@@ -26,6 +26,10 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
   const { token } = useToken();
   const { data: user } = useGetIdentity<IUser>();
   const { mode, setMode } = useContext(ColorModeContext);
+
+  useEffect(() => {
+    setMode("dark");
+  }, []);
 
   const headerStyles: React.CSSProperties = {
     backgroundColor: token.colorBgElevated,

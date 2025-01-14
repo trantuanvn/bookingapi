@@ -180,14 +180,14 @@ export const SpaceShow = () => {
                   }}
                   draggable
                   onDrag={(ev: any) => {
-                    let el = document.getElementById(
+                    const el = document.getElementById(
                       `workspace-${workspace.id}`
                     );
-                    var offsets = document
+                    const offsets = document
                       .getElementById("space")
                       ?.getBoundingClientRect();
-                    var top = offsets?.top || 0;
-                    var left = offsets?.left || 0;
+                    const top = offsets?.top || 0;
+                    const left = offsets?.left || 0;
                     if (el) {
                       el.style.left = ev.clientX - left + "px";
                       el.style.top = ev.clientY - top + "px";
@@ -195,14 +195,14 @@ export const SpaceShow = () => {
                     }
                   }}
                   onDragEnd={(e) => {
-                    let el = document.getElementById(
+                    const el = document.getElementById(
                       `workspace-${workspace.id}`
                     );
-                    var offsets = document
+                    const offsets = document
                       .getElementById("space")
                       ?.getBoundingClientRect();
-                    var top = offsets?.top || 0;
-                    var left = offsets?.left || 0;
+                    const top = offsets?.top || 0;
+                    const left = offsets?.left || 0;
                     const x = e.clientX - left;
                     const y = e.clientY - top;
                     if (el) {

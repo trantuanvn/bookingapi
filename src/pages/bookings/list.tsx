@@ -14,7 +14,7 @@ export const BookingList = () => {
   const { tableProps } = useTable({
     syncWithLocation: true,
     meta: {
-      populate: ["user", "work_space.space"],
+      populate: "*",
     },
   });
 
@@ -28,9 +28,11 @@ export const BookingList = () => {
           render={(v) => v?.username}
         />
         <Table.Column
-          dataIndex="work_space"
+          dataIndex="booking_items"
           title={"Space / Workspace"}
-          render={(r) => `${r?.space?.name} - ${r?.name}`}
+          render={(r) =>
+            r?.map((a: any) => `${a?.space?.name} - ${a?.name}`).join(" , ")
+          }
         />
         <Table.Column
           dataIndex="start"

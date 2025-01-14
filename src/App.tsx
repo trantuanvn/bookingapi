@@ -1,6 +1,6 @@
-import { Authenticated, GitHubBanner, Refine } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import { Authenticated, Refine } from "@refinedev/core";
+import { DevtoolsProvider } from "@refinedev/devtools";
+import { RefineKbarProvider } from "@refinedev/kbar";
 
 import {
   AuthPage,
@@ -13,11 +13,9 @@ import "@refinedev/antd/dist/reset.css";
 
 import routerBindings, {
   CatchAllNavigate,
-  DocumentTitleHandler,
   NavigateToResource,
-  UnsavedChangesNotifier,
 } from "@refinedev/react-router-v6";
-import { App as AntdApp } from "antd";
+import { App as AntdApp, Typography } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { authProvider, axiosInstance } from "./authProvider";
 import { Header } from "./components/header";
@@ -89,7 +87,17 @@ function App() {
                       >
                         <ThemedLayoutV2
                           Header={Header}
-                          Sider={(props) => <ThemedSiderV2 {...props} fixed />}
+                          Sider={(props) => (
+                            <ThemedSiderV2
+                              {...props}
+                              fixed
+                              Title={() => (
+                                <Typography.Title level={3}>
+                                  Booking app
+                                </Typography.Title>
+                              )}
+                            />
+                          )}
                         >
                           <Outlet />
                         </ThemedLayoutV2>
