@@ -1,18 +1,24 @@
-import { Show } from "@refinedev/antd";
+import { Show, useModalForm, useSelect } from "@refinedev/antd";
 import { useList } from "@refinedev/core";
 import {
   Button,
   Calendar,
   Card,
   Col,
+  Form,
+  Input,
   InputNumber,
+  Modal,
   Row,
+  Select,
   Space,
   Table,
   Typography,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { API_URL } from "../constants";
+import dayjs from "dayjs";
+import { start } from "repl";
 
 const { Title } = Typography;
 
@@ -57,7 +63,7 @@ export const Board = () => {
   };
   const [zoom, setZoom] = useState(1);
   return (
-    <Show title="Board" headerButtons={[]}>
+    <Show title="Board" headerButtons={[<CreateBooking />]}>
       <Row gutter={[12, 12]}>
         <Col span={8}>
           <Card title="Bookings" size="small">
@@ -71,7 +77,7 @@ export const Board = () => {
             </Table>
           </Card>
         </Col>
-        <Col span={14}>
+        <Col span={16}>
           <Card title="Calendar" size="small">
             <Calendar
               cellRender={(r) => renderDate(r.format("YYYY-MM-DD"))}
@@ -161,5 +167,179 @@ export const Board = () => {
         </Col>
       </Row>
     </Show>
+  );
+};
+
+const CreateBooking = () => {
+  const { modalProps, formProps, show, close } = useModalForm({
+    action: "create",
+    resource: "bookings",
+    redirect: false,
+  });
+  const { selectProps } = useSelect({
+    resource: "work-spaces",
+    meta: {
+      populate: "*",
+    },
+    optionLabel: "name",
+    optionValue: "documentId",
+    pagination: {
+      pageSize: 100,
+    },
+  });
+  const { data } = useList({
+    resource: "users",
+    meta: {
+      populate: "*",
+    },
+    filters: [
+      {
+        field: "role",
+        operator: "eq",
+        value: "1",
+      },
+    ],
+  });
+
+  const userList = data?.data || [];
+
+  const userId = Form.useWatch("user", formProps.form);
+  useEffect(() => {
+    const user = userList.find((u) => u.id === userId);
+    if (user) {
+      formProps.form?.setFieldsValue({
+        name: user.full_name || user.username,
+        phone: user.phoneNumber,
+        email: user.email,
+      });
+    }
+  }, [userId, userList]);
+
+  const times = [];
+  for (let i = 8; i < 22; i++) {
+    times.push(("00" + i).slice(-2) + ":00");
+    times.push(("00" + i).slice(-2) + ":30");
+  }
+  return (
+    <>
+      <Button
+        type="primary"
+        onClick={() => {
+          show();
+        }}
+      >
+        Create Booking
+      </Button>
+
+      <Modal {...modalProps}>
+        <Form
+          {...formProps}
+          initialValues={{
+            date: dayjs().format("YYYY-MM-DD"),
+            start_time: "08:00",
+            end_time: "08:30",
+            booking_items: [{}],
+          }}
+          layout="vertical"
+          onFinish={(values: any) => {
+            const dataSend = {
+              ...values,
+              booking_items: values.booking_items.map((b: any) => ({
+                work_space: b.work_space,
+                start_time: values.start_time,
+                end_time: values.end_time,
+                date: values.date,
+              })),
+            };
+            return formProps.onFinish?.(dataSend);
+          }}
+        >
+          <Row gutter={[12, 0]}>
+            <Col span={12}>
+              <Form.Item name="date" label="Date">
+                <Input type="date" />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item name="start_time" label="Start time">
+                <Select>
+                  {times.map((t) => (
+                    <Select.Option key={t} value={t}>
+                      {t}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item name="end_time" label="End time">
+                <Select>
+                  {times.map((t) => (
+                    <Select.Option key={t} value={t}>
+                      {t}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={9}>
+              <Form.Item name="user" label="User">
+                <Select>
+                  {userList.map((u) => (
+                    <Select.Option key={u.id} value={u.id}>
+                      {u.username}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={5}>
+              <Form.Item name="name" label="Name">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={5}>
+              <Form.Item name="phone" label="Phone">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={5}>
+              <Form.Item name="email" label="Email">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.List name="booking_items">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map((field, index) => {
+                      return (
+                        <Row gutter={12} key={field.key}>
+                          <Col span={20}>
+                            <Form.Item
+                              {...field}
+                              key={field.key}
+                              name={[field.name, "work_space"]}
+                            >
+                              <Select {...selectProps} />
+                            </Form.Item>
+                          </Col>
+                          <Col span={4}>
+                            <Button block onClick={() => remove(index)}>
+                              Remove
+                            </Button>
+                          </Col>
+                        </Row>
+                      );
+                    })}
+                    <Button onClick={() => add()}>Add</Button>
+                  </>
+                )}
+              </Form.List>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+    </>
   );
 };
