@@ -126,30 +126,32 @@ export const Board = () => {
                         position: "relative",
                       }}
                     >
-                      {workSpaces.map((workspace: any) => {
-                        const colors: any = {
-                          seat: "red",
-                          meeting_room: "blue",
-                          conference_room: "green",
-                          lounge: "yellow",
-                        };
-                        return (
-                          <div
-                            key={workspace.id}
-                            id={`workspace-${workspace.id}`}
-                            style={{
-                              position: "absolute",
-                              left: workspace.position_x * 100 * zoom + "px",
-                              top: workspace.position_y * 100 * zoom + "px",
-                              width: workspace.width * 100 * zoom + "px",
-                              height: workspace.height * 100 * zoom + "px",
-                              background: colors[workspace.type] ?? "black",
-                              opacity: 0.6,
-                            }}
-                            draggable
-                          ></div>
-                        );
-                      })}
+                      {workSpaces
+                        .filter((a) => a.space?.id == s.id)
+                        .map((workspace: any) => {
+                          const colors: any = {
+                            seat: "red",
+                            meeting_room: "blue",
+                            conference_room: "green",
+                            lounge: "yellow",
+                          };
+                          return (
+                            <div
+                              key={workspace.id}
+                              id={`workspace-${workspace.id}`}
+                              style={{
+                                position: "absolute",
+                                left: workspace.position_x * 100 * zoom + "px",
+                                top: workspace.position_y * 100 * zoom + "px",
+                                width: workspace.width * 100 * zoom + "px",
+                                height: workspace.height * 100 * zoom + "px",
+                                background: colors[workspace.type] ?? "black",
+                                opacity: 0.6,
+                              }}
+                              draggable
+                            ></div>
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
