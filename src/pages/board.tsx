@@ -26,7 +26,7 @@ import _ from "lodash";
 const { Title } = Typography;
 
 export const Board = () => {
-  const { data } = useList({
+  const { data, refetch } = useList({
     resource: "booking-items",
     meta: {
       populate: "*",
@@ -34,6 +34,19 @@ export const Board = () => {
     pagination: {
       pageSize: 100,
     },
+    filters: [
+      {
+        field: "date",
+        operator: "gte",
+        value: dayjs().format("YYYY-MM-DD"),
+      },
+    ],
+    sorters: [
+      {
+        field: "date",
+        order: "asc",
+      },
+    ],
   });
   const bookings = data?.data || [];
 
@@ -42,12 +55,18 @@ export const Board = () => {
     meta: {
       populate: "*",
     },
+    pagination: {
+      pageSize: 100,
+    },
   });
 
   const { data: dataWorksSpaces } = useList({
     resource: "work-spaces",
     meta: {
       populate: "*",
+    },
+    pagination: {
+      pageSize: 100,
     },
   });
 
@@ -60,16 +79,27 @@ export const Board = () => {
     return (
       <div>
         {bookingList.map((b) => (
-          <Tag key={b.id}>{b.booking?.code}</Tag>
+          <Tag color="blue" key={b.id}>
+            {b.booking?.code}
+          </Tag>
         ))}
       </div>
     );
   };
   const [zoom, setZoom] = useState(1);
   return (
-    <Show title="Board" headerButtons={[<CreateBooking />]}>
+    <Show
+      title="Board"
+      headerButtons={[
+        <CreateBooking
+          onDone={() => {
+            refetch();
+          }}
+        />,
+      ]}
+    >
       <Row gutter={[12, 12]}>
-        <Col span={8}>
+        <Col span={12}>
           <Card title="Bookings" size="small">
             <Table
               dataSource={bookings}
@@ -77,16 +107,41 @@ export const Board = () => {
               size="small"
               pagination={{ pageSize: 20 }}
             >
-              <Table.Column dataIndex={["booking", "code"]} title="Code" />
+              <Table.Column
+                dataIndex={["booking"]}
+                title="Code"
+                render={(r) => {
+                  if (r.state == "pending")
+                    return <Tag color="red">{r.code}</Tag>;
+                  if (r.state == "approved")
+                    return <Tag color="green">{r.code}</Tag>;
+                  return <Tag color="blue">{r.code}</Tag>;
+                }}
+              />
               <Table.Column dataIndex="date" title="Date" />
-              <Table.Column dataIndex="start_time" title="Start time" />
-              <Table.Column dataIndex="end_time" title="End time" />
-              <Table.Column dataIndex="state" title="Status" />
+              <Table.Column
+                dataIndex="start_time"
+                title="Time"
+                render={(_, r) => {
+                  return r.start_time + " - " + r.end_time;
+                }}
+              />
+              {/* <Table.Column dataIndex="state" title="Status" /> */}
               <Table.Column dataIndex={["work_space", "name"]} title="Status" />
+              <Table.Column dataIndex="total" title="Total" />
+              <Table.Column
+                render={(r) => {
+                  return (
+                    <Button type="primary" size="small">
+                      Payment
+                    </Button>
+                  );
+                }}
+              />
             </Table>
           </Card>
         </Col>
-        <Col span={16}>
+        <Col span={12}>
           <Card title="Calendar" size="small">
             <Calendar
               cellRender={(r) => renderDate(r.format("YYYY-MM-DD"))}
@@ -179,11 +234,14 @@ export const Board = () => {
   );
 };
 
-const CreateBooking = () => {
+const CreateBooking = ({ onDone }: { onDone: any }) => {
   const { modalProps, formProps, show, close } = useModalForm({
     action: "create",
     resource: "bookings",
     redirect: false,
+    onMutationSuccess: () => {
+      onDone();
+    },
   });
   const { data: dataWorkSpace } = useList({
     resource: "work-spaces",
@@ -256,20 +314,20 @@ const CreateBooking = () => {
               "minute"
             );
             console.log("offsetTime", offsetTime);
+            const booking_items = values.booking_items.map((b: any) => ({
+              work_space: b.work_space,
+              start_time: values.start_time,
+              end_time: values.end_time,
+              date: date,
+              price: b.price,
+              total: b.price * (offsetTime / 60),
+              quantity: b.quantity || 1,
+            }));
             const dataSend = {
               ...values,
-              booking_items: values.booking_items.map((b: any) => ({
-                work_space: b.work_space,
-                start_time: values.start_time,
-                end_time: values.end_time,
-                date: date,
-                price: b.price * (offsetTime / 60),
-                quantity: b.quantity,
-              })),
-              total: values.booking_items.reduce(
-                (acc: number, b: any) => acc + b.price * (offsetTime / 60),
-                0
-              ),
+              booking_items: booking_items,
+              total: _.sumBy(booking_items, "total"),
+              totalPayment: 0,
             };
             return formProps.onFinish?.(dataSend);
           }}
