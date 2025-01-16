@@ -74,10 +74,10 @@ export const SpaceShow = () => {
         space: data.id,
         width: 2,
         height: 2,
-        positionX: 0,
-        positionY: 0,
+        position_x: 0,
+        position_y: 0,
         type: "seat",
-        pricePerHour: 10, // 10USD per hour
+        price_per_hour: 10, // 10USD per hour
       },
     });
   };
@@ -171,8 +171,8 @@ export const SpaceShow = () => {
                   id={`workspace-${workspace.id}`}
                   style={{
                     position: "absolute",
-                    left: workspace.positionX * 100 * zoom + "px",
-                    top: workspace.positionY * 100 * zoom + "px",
+                    left: workspace.position_x * 100 * zoom + "px",
+                    top: workspace.position_y * 100 * zoom + "px",
                     width: workspace.width * 100 * zoom + "px",
                     height: workspace.height * 100 * zoom + "px",
                     background: colors[workspace.type] ?? "black",
@@ -210,8 +210,8 @@ export const SpaceShow = () => {
                         resource: "work-spaces",
                         id: workspace.documentId,
                         values: {
-                          positionX: x / 100 / zoom,
-                          positionY: y / 100 / zoom,
+                          position_x: x / 100 / zoom,
+                          position_y: y / 100 / zoom,
                         },
                       });
                     }
@@ -245,11 +245,11 @@ export const SpaceShow = () => {
             }}
           />
           <Table.Column dataIndex="code" title={"Code"} />
-          <Table.Column dataIndex="positionX" title={"X"} />
-          <Table.Column dataIndex="positionY" title={"Y"} />
+          <Table.Column dataIndex="position_x" title={"X"} />
+          <Table.Column dataIndex="position_y" title={"Y"} />
           <Table.Column dataIndex="width" title={"Width"} />
           <Table.Column dataIndex="height" title={"Height"} />
-          <Table.Column dataIndex="pricePerHour" title={"Giá"} />
+          <Table.Column dataIndex="price_per_hour" title={"Giá"} />
 
           <Table.Column
             width={200}
@@ -274,8 +274,8 @@ export const SpaceShow = () => {
                         space: data.id,
                         width: record.width,
                         height: record.height,
-                        positionX: record.positionX,
-                        positionY: record.positionY,
+                        position_x: record.position_x,
+                        position_y: record.position_y,
                         type: record.type,
                       },
                     });
@@ -415,7 +415,7 @@ export const SpaceShow = () => {
             <InputNumber width="100%" />
           </Form.Item>
 
-          <Form.Item label="Giá" name="pricePerHour">
+          <Form.Item label="Giá" name="price_per_hour">
             <InputNumber width="100%" />
           </Form.Item>
         </Form>

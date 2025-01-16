@@ -14,7 +14,7 @@ export const BookingList = () => {
   const { tableProps } = useTable({
     syncWithLocation: true,
     meta: {
-      populate: "*",
+      populate: ["user", "booking_items.work_space.space"],
     },
   });
 
@@ -31,26 +31,29 @@ export const BookingList = () => {
           dataIndex="booking_items"
           title={"Space / Workspace"}
           render={(r) =>
-            r?.map((a: any) => `${a?.space?.name} - ${a?.name}`).join(" , ")
+            r
+              ?.map(
+                (a: any) =>
+                  `${a.work_space?.space?.name} - ${a.work_space?.name}`
+              )
+              .join(" , ")
           }
         />
         <Table.Column
-          dataIndex="start"
+          dataIndex="booking_items"
           title={"Date"}
-          render={(r) => <DateField value={r} format="YYYY-MM-DD" />}
+          render={(r) =>
+            r
+              ?.map((a: any) => `${a.date} ${a.start_time}-${a.end_time}`)
+              .join(" , ")
+          }
         />
+        <Table.Column dataIndex="state" title={"Status code"} />
         <Table.Column
-          dataIndex="start"
-          title={"Time"}
-          render={(r, c: any) => (
-            <p>
-              <DateField value={c.start} format="HH:mm" /> -
-              <DateField value={c.end} format="HH:mm" />
-            </p>
-          )}
+          dataIndex="name"
+          title={" Name"}
+          render={(v, r) => `${r?.name}  ${r?.email} ${r.phone}`}
         />
-        <Table.Column dataIndex="type" title={"Type"} />
-        <Table.Column dataIndex="statusCode" title={"Status code"} />
 
         <Table.Column
           title={"Actions"}

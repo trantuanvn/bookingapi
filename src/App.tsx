@@ -27,6 +27,8 @@ import { DataProvider } from "./dataProvider";
 import { SpaceCreate, SpaceList, SpaceShow } from "./pages/spaces";
 
 function App() {
+  document.title = "LaSpace | Admin";
+  localStorage.setItem("colorMode", "dark");
   return (
     <BrowserRouter>
       {/* <GitHubBanner /> */}
@@ -93,7 +95,7 @@ function App() {
                               fixed
                               Title={() => (
                                 <Typography.Title level={3}>
-                                  Booking app
+                                  LaSpace
                                 </Typography.Title>
                               )}
                             />
