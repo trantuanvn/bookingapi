@@ -14,12 +14,14 @@ import {
   Select,
   Space,
   Table,
+  Tag,
   Typography,
 } from "antd";
 import { useEffect, useState } from "react";
 import { API_URL } from "../constants";
 import dayjs from "dayjs";
 import { start } from "repl";
+import _ from "lodash";
 
 const { Title } = Typography;
 
@@ -53,14 +55,12 @@ export const Board = () => {
   const workSpaces = dataWorksSpaces?.data || [];
 
   const renderDate = (date: any) => {
-    const booking = bookings.filter((b: any) => b.date === date);
+    let bookingList = bookings.filter((b: any) => b.date === date);
+    bookingList = _.uniqBy(bookingList, "booking.code");
     return (
       <div>
-        {booking.map((b) => (
-          <div key={b.id}>
-            {b.booking?.code} - {b.start_time}-{b.end_time} -{" "}
-            {b.work_space?.name}
-          </div>
+        {bookingList.map((b) => (
+          <Tag key={b.id}>{b.booking?.code}</Tag>
         ))}
       </div>
     );
@@ -71,7 +71,12 @@ export const Board = () => {
       <Row gutter={[12, 12]}>
         <Col span={8}>
           <Card title="Bookings" size="small">
-            <Table dataSource={bookings} rowKey="id" size="small">
+            <Table
+              dataSource={bookings}
+              rowKey="id"
+              size="small"
+              pagination={{ pageSize: 20 }}
+            >
               <Table.Column dataIndex={["booking", "code"]} title="Code" />
               <Table.Column dataIndex="date" title="Date" />
               <Table.Column dataIndex="start_time" title="Start time" />
@@ -185,8 +190,6 @@ const CreateBooking = () => {
     meta: {
       populate: "*",
     },
-    // optionLabel: "name",
-    // optionValue: "documentId",
     pagination: {
       pageSize: 100,
     },
