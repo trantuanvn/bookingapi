@@ -1,8 +1,20 @@
 import { Show } from "@refinedev/antd";
 import { useList } from "@refinedev/core";
-import { Calendar, Card, Col, Row, Table } from "antd";
+import {
+  Button,
+  Calendar,
+  Card,
+  Col,
+  InputNumber,
+  Row,
+  Space,
+  Table,
+  Typography,
+} from "antd";
 import { useState } from "react";
 import { API_URL } from "../constants";
+
+const { Title } = Typography;
 
 export const Board = () => {
   const { data } = useList({
@@ -68,16 +80,39 @@ export const Board = () => {
           </Card>
         </Col>
         <Col span={24}>
-          <Card title="Map" size="small">
+          <Card
+            title={
+              <Space size="small">
+                <Title level={5} style={{ margin: 0, marginRight: 24 }}>
+                  Map
+                </Title>
+                <Button size="small" onClick={() => setZoom(zoom - 0.01)}>
+                  -
+                </Button>
+                <InputNumber
+                  value={Math.round(zoom * 100)}
+                  suffix="%"
+                  onChange={(value) => {
+                    setZoom((value || 0) / 100);
+                  }}
+                />
+                <Button size="small" onClick={() => setZoom(zoom + 0.01)}>
+                  +
+                </Button>
+              </Space>
+            }
+            size="small"
+          >
             {spaces.map((s: any) => {
               const bg = API_URL + s.background?.url || "";
               return (
                 <div key={s.id}>
-                  <p>{s.name}</p>
+                  <Title level={5}>{s.name}</Title>
                   <div
                     id="space"
                     style={{
                       overflow: "auto",
+                      marginBottom: "24px",
                     }}
                   >
                     <div
