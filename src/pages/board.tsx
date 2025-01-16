@@ -5,6 +5,7 @@ import {
   Calendar,
   Card,
   Col,
+  DatePicker,
   Form,
   Input,
   InputNumber,
@@ -27,6 +28,9 @@ export const Board = () => {
     resource: "booking-items",
     meta: {
       populate: "*",
+    },
+    pagination: {
+      pageSize: 100,
     },
   });
   const bookings = data?.data || [];
@@ -176,13 +180,13 @@ const CreateBooking = () => {
     resource: "bookings",
     redirect: false,
   });
-  const { selectProps } = useSelect({
+  const { data: dataWorkSpace } = useList({
     resource: "work-spaces",
     meta: {
       populate: "*",
     },
-    optionLabel: "name",
-    optionValue: "documentId",
+    // optionLabel: "name",
+    // optionValue: "documentId",
     pagination: {
       pageSize: 100,
     },
@@ -202,6 +206,7 @@ const CreateBooking = () => {
   });
 
   const userList = data?.data || [];
+  const workSpaces = dataWorkSpace?.data || [];
 
   const userId = Form.useWatch("user", formProps.form);
   useEffect(() => {
@@ -242,26 +247,47 @@ const CreateBooking = () => {
           }}
           layout="vertical"
           onFinish={(values: any) => {
+            const date = dayjs(values.date).format("YYYY-MM-DD");
+            const offsetTime = dayjs(date + " " + values.end_time).diff(
+              date + " " + values.start_time,
+              "minute"
+            );
+            console.log("offsetTime", offsetTime);
             const dataSend = {
               ...values,
               booking_items: values.booking_items.map((b: any) => ({
                 work_space: b.work_space,
                 start_time: values.start_time,
                 end_time: values.end_time,
-                date: values.date,
+                date: date,
+                price: b.price * (offsetTime / 60),
+                quantity: b.quantity,
               })),
+              total: values.booking_items.reduce(
+                (acc: number, b: any) => acc + b.price * (offsetTime / 60),
+                0
+              ),
             };
             return formProps.onFinish?.(dataSend);
           }}
         >
           <Row gutter={[12, 0]}>
             <Col span={12}>
-              <Form.Item name="date" label="Date">
-                <Input type="date" />
+              <Form.Item
+                name="date"
+                label="Date"
+                getValueProps={(i) => ({ value: dayjs(i) })}
+                rules={[{ required: true }]}
+              >
+                <DatePicker />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="start_time" label="Start time">
+              <Form.Item
+                name="start_time"
+                label="Start time"
+                rules={[{ required: true }]}
+              >
                 <Select>
                   {times.map((t) => (
                     <Select.Option key={t} value={t}>
@@ -272,7 +298,11 @@ const CreateBooking = () => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="end_time" label="End time">
+              <Form.Item
+                name="end_time"
+                label="End time"
+                rules={[{ required: true }]}
+              >
                 <Select>
                   {times.map((t) => (
                     <Select.Option key={t} value={t}>
@@ -294,12 +324,16 @@ const CreateBooking = () => {
               </Form.Item>
             </Col>
             <Col span={5}>
-              <Form.Item name="name" label="Name">
+              <Form.Item name="name" label="Name" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
             </Col>
             <Col span={5}>
-              <Form.Item name="phone" label="Phone">
+              <Form.Item
+                name="phone"
+                label="Phone"
+                rules={[{ required: true }]}
+              >
                 <Input />
               </Form.Item>
             </Col>
@@ -309,33 +343,67 @@ const CreateBooking = () => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.List name="booking_items">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map((field, index) => {
-                      return (
-                        <Row gutter={12} key={field.key}>
-                          <Col span={20}>
-                            <Form.Item
-                              {...field}
-                              key={field.key}
-                              name={[field.name, "work_space"]}
-                            >
-                              <Select {...selectProps} />
-                            </Form.Item>
-                          </Col>
-                          <Col span={4}>
-                            <Button block onClick={() => remove(index)}>
-                              Remove
-                            </Button>
-                          </Col>
-                        </Row>
-                      );
-                    })}
-                    <Button onClick={() => add()}>Add</Button>
-                  </>
-                )}
-              </Form.List>
+              <Card title="Booking Items" size="small">
+                <Form.List name="booking_items">
+                  {(fields, { add, remove }) => (
+                    <>
+                      {fields.map((field, index) => {
+                        return (
+                          <Row gutter={12} key={field.key}>
+                            <Col span={12}>
+                              <Form.Item
+                                {...field}
+                                key={field.key}
+                                label="Work Space"
+                                rules={[{ required: true }]}
+                                name={[field.name, "work_space"]}
+                              >
+                                <Select>
+                                  {workSpaces.map((w) => (
+                                    <Select.Option key={w.id} value={w.id}>
+                                      {w.type} - {w.name} | {w.space?.name} (
+                                      {w.price_per_hour} USD)
+                                    </Select.Option>
+                                  ))}
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                            <Col span={4}>
+                              <Form.Item
+                                {...field}
+                                key={field.key}
+                                rules={[{ required: true }]}
+                                label="Price per hour"
+                                name={[field.name, "price"]}
+                              >
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                            <Col span={4}>
+                              <Form.Item
+                                {...field}
+                                key={field.key}
+                                label="Quantity"
+                                name={[field.name, "quantity"]}
+                                initialValue={1}
+                              >
+                                <InputNumber value={1} disabled />
+                              </Form.Item>
+                            </Col>
+                            <Col span={4}>
+                              <div style={{ height: "28px" }} />
+                              <Button block onClick={() => remove(index)}>
+                                Remove
+                              </Button>
+                            </Col>
+                          </Row>
+                        );
+                      })}
+                      <Button onClick={() => add()}>Add</Button>
+                    </>
+                  )}
+                </Form.List>
+              </Card>
             </Col>
           </Row>
         </Form>
