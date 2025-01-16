@@ -25,10 +25,14 @@ import { BookingCreate, BookingList, BookingShow } from "./pages/bookings";
 import { UserCreate, UserList, UserShow } from "./pages/user";
 import { DataProvider } from "./dataProvider";
 import { SpaceCreate, SpaceList, SpaceShow } from "./pages/spaces";
+import { useEffect } from "react";
+import { Board } from "./pages/board";
 
 function App() {
   document.title = "LaSpace | Admin";
-  localStorage.setItem("colorMode", "dark");
+  useEffect(() => {
+    localStorage.setItem("colorMode", "dark");
+  }, []);
   return (
     <BrowserRouter>
       {/* <GitHubBanner /> */}
@@ -42,6 +46,10 @@ function App() {
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
                 resources={[
+                  {
+                    name: "board",
+                    list: "/board",
+                  },
                   {
                     name: "users",
                     list: "/users",
@@ -110,6 +118,9 @@ function App() {
                       index
                       element={<NavigateToResource resource="blog-posts" />}
                     />
+                    <Route path="/board">
+                      <Route index element={<Board />} />
+                    </Route>
                     <Route path="/bookings">
                       <Route index element={<BookingList />} />
                       <Route path="create" element={<BookingCreate />} />
