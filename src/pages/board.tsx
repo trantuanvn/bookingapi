@@ -211,13 +211,25 @@ const Map = () => {
                   style={{
                     width: s.width * 100 * zoom + "px",
                     height: s.height * 100 * zoom + "px",
-                    backgroundImage: `url(${bg})`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundColor: "yellow",
-                    backgroundSize: "100% auto",
+
+                    // backgroundColor: "yellow",
                     position: "relative",
                   }}
                 >
+                  <div
+                    style={{
+                      backgroundImage: `url(${bg})`,
+                      backgroundRepeat: "no-repeat",
+                      position: "absolute",
+                      backgroundSize: "100% 100%",  
+                      top: 0,
+                      bottom: 0,
+
+                      width: s.width * 100 * zoom + "px",
+                      height: s.height * 100 * zoom + "px",
+                      opacity: 0.6,
+                    }}
+                  />
                   {workSpaces
                     .filter((a) => a.space?.id == s.id)
                     .map((workspace: any) => {
@@ -238,7 +250,6 @@ const Map = () => {
                             width: workspace.width * 100 * zoom + "px",
                             height: workspace.height * 100 * zoom + "px",
                             background: colors[workspace.type] ?? "black",
-                            opacity: 0.6,
                           }}
                           draggable
                         ></div>
