@@ -544,10 +544,12 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               total: _.sumBy(booking_items, "total"),
             };
             if (isPayment) {
-              dataSend.totalPayment = {
+              dataSend.payment = {
                 note: values.payment?.note,
                 ref_code: values.payment?.ref_code,
                 payment_method: values.payment?.payment_method,
+                state: "DONE",
+                payment_date: dayjs().format("YYYY-MM-DD HH:mm:ss"),  
               };
             }
             return formProps.onFinish?.(dataSend);

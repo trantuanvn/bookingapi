@@ -32,7 +32,7 @@ export const UserShow = () => {
     filters: {
       permanent: [
         {
-          field: "user.documentId",
+          field: "user",
           operator: "eq",
           value: record?.id,
         },
@@ -78,10 +78,14 @@ export const UserShow = () => {
       <br />
       <Card title="Payment">
         <Table {...tablePropsPayment}>
-          <Table.Column title="Payment Method" dataIndex="paymentMethod" />
+          <Table.Column title="Payment Method" dataIndex="payment_method" />
           <Table.Column title="Amount" dataIndex="amount" />
-          <Table.Column title="Status" dataIndex="status" />
-          <Table.Column title="Created At" dataIndex="createdAt" />
+          <Table.Column title="Status" dataIndex="state" />
+          <Table.Column
+            title="payment_date"
+            dataIndex="payment_date"
+            render={(value) => <DateField value={value} format="DD/MM/YYYY hh:mm" />}
+          />
         </Table>
       </Card>
     </Show>
