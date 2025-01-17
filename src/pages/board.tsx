@@ -10,6 +10,7 @@ import {
   Input,
   InputNumber,
   Modal,
+  Popover,
   Row,
   Select,
   Space,
@@ -22,6 +23,8 @@ import { API_URL } from "../constants";
 import dayjs from "dayjs";
 import { start } from "repl";
 import _ from "lodash";
+import { PlusOutlined } from "@ant-design/icons";
+import Search from "antd/lib/input/Search";
 
 const { Title } = Typography;
 
@@ -79,9 +82,7 @@ export const Board = () => {
     return (
       <div>
         {bookingList.map((b) => (
-          <Tag color="blue" key={b.id}>
-            {b.booking?.code}
-          </Tag>
+          <BookingCode key={b.booking.code} booking={b.booking} />
         ))}
       </div>
     );
@@ -91,6 +92,10 @@ export const Board = () => {
     <Show
       title="Board"
       headerButtons={[
+        <Search
+          placeholder="input search text"
+          onSearch={(value) => console.log(value)}
+        />,
         <CreateBooking
           onDone={() => {
             refetch();
@@ -110,13 +115,7 @@ export const Board = () => {
               <Table.Column
                 dataIndex={["booking"]}
                 title="Code"
-                render={(r) => {
-                  if (r.state == "pending")
-                    return <Tag color="red">{r.code}</Tag>;
-                  if (r.state == "approved")
-                    return <Tag color="green">{r.code}</Tag>;
-                  return <Tag color="blue">{r.code}</Tag>;
-                }}
+                render={(r) => <BookingCode booking={r} />}
               />
               <Table.Column dataIndex="date" title="Date" />
               <Table.Column
@@ -130,12 +129,8 @@ export const Board = () => {
               <Table.Column dataIndex={["work_space", "name"]} title="Status" />
               <Table.Column dataIndex="total" title="Total" />
               <Table.Column
-                render={(r) => {
-                  return (
-                    <Button type="primary" size="small">
-                      Payment
-                    </Button>
-                  );
+                render={(_, r) => {
+                  return <PaymentButton booking={r} />;
                 }}
               />
             </Table>
@@ -234,6 +229,40 @@ export const Board = () => {
   );
 };
 
+const BookingCode = ({ booking }: { booking: any }) => {
+  let tag = <Tag color="blue">{booking.code}</Tag>;
+  if (booking.state == "pending") {
+    tag = <Tag color="red">{booking.code}</Tag>;
+  }
+  if (booking.state == "approved") {
+    tag = <Tag color="green">{booking.code}</Tag>;
+  }
+
+  return (
+    <Popover
+      title="Booking Detail"
+      content={
+        <Card size="small">
+          <p>Code: {booking.code}</p>
+          <p>Status: {booking.state}</p>
+          <p>Total: {booking.total}</p>
+          <p>Total Payment: {booking.totalPayment}</p>
+        </Card>
+      }
+    >
+      {tag}
+    </Popover>
+  );
+};
+
+const PaymentButton = ({ booking }: { booking: any }) => {
+  return (
+    <Button type="primary" size="small">
+      Payment
+    </Button>
+  );
+};
+
 const CreateBooking = ({ onDone }: { onDone: any }) => {
   const { modalProps, formProps, show, close } = useModalForm({
     action: "create",
@@ -293,6 +322,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
         onClick={() => {
           show();
         }}
+        icon={<PlusOutlined />}
       >
         Create Booking
       </Button>
