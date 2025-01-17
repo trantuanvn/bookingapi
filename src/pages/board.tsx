@@ -1,11 +1,13 @@
-import { Show, useModalForm, useSelect } from "@refinedev/antd";
+import { NumberField, Show, useModalForm, useSelect } from "@refinedev/antd";
 import { useList } from "@refinedev/core";
 import {
   Button,
   Calendar,
   Card,
+  Checkbox,
   Col,
   DatePicker,
+  Divider,
   Form,
   Input,
   InputNumber,
@@ -14,6 +16,7 @@ import {
   Row,
   Select,
   Space,
+  Switch,
   Table,
   Tag,
   Typography,
@@ -31,31 +34,41 @@ const { Title } = Typography;
 
 export const Board = () => {
   const { data, refetch } = useList({
-    resource: "booking-items",
+    resource: "bookings",
     meta: {
-      populate: "*",
+      populate: ["user", "booking_items.work_space.space"],
     },
     pagination: {
       pageSize: 100,
     },
     filters: [
       {
-        field: "date",
+        field: "booking_items.date",
         operator: "gte",
         value: dayjs().format("YYYY-MM-DD"),
       },
     ],
     sorters: [
       {
-        field: "date",
+        field: "booking_items.date",
         order: "asc",
       },
     ],
   });
   const bookings = data?.data || [];
 
+  const bookingItems: any[] = [];
+  bookings.forEach((b) => {
+    b.booking_items.forEach((bi: any) => {
+      bookingItems.push({
+        booking: b,
+        ...bi,
+      });
+    });
+  });
+
   const renderDate = (date: any) => {
-    let bookingList = bookings.filter((b: any) => b.date === date);
+    let bookingList = bookingItems.filter((b: any) => b.date === date);
     bookingList = _.uniqBy(bookingList, "booking.code");
     return (
       <div>
@@ -92,21 +105,34 @@ export const Board = () => {
               <Table.Column
                 dataIndex={["booking"]}
                 title="Code"
-                render={(r) => <BookingCode booking={r} />}
+                render={(_, r) => <BookingCode booking={r} />}
               />
-              <Table.Column dataIndex="date" title="Date" />
+              <Table.Column
+                dataIndex="date"
+                title="Date"
+                render={(__, r) => _.get(r, "booking_items[0].date")}
+              />
               <Table.Column
                 dataIndex="start_time"
                 title="Time"
                 render={(_, r) => {
-                  return r.start_time + " - " + r.end_time;
+                  return (
+                    <Space direction="vertical">
+                      {r.booking_items.map((b: any, idx: number) => (
+                        <span>
+                          {idx + 1}. {b.start_time} {b.end_time} -{" "}
+                          {b.work_space?.name}
+                        </span>
+                      ))}
+                    </Space>
+                  );
                 }}
               />
-              {/* <Table.Column dataIndex="state" title="Status" /> */}
-              <Table.Column dataIndex={["work_space", "name"]} title="Status" />
               <Table.Column dataIndex="total" title="Total" />
               <Table.Column
                 render={(_, r) => {
+                  if (r.state == "approved")
+                    return <Tag color="green">Paid</Tag>;
                   return <PaymentButton booking={r} />;
                 }}
               />
@@ -211,8 +237,6 @@ const Map = () => {
                   style={{
                     width: s.width * 100 * zoom + "px",
                     height: s.height * 100 * zoom + "px",
-
-                    // backgroundColor: "yellow",
                     position: "relative",
                   }}
                 >
@@ -221,7 +245,7 @@ const Map = () => {
                       backgroundImage: `url(${bg})`,
                       backgroundRepeat: "no-repeat",
                       position: "absolute",
-                      backgroundSize: "100% 100%",  
+                      backgroundSize: "100% 100%",
                       top: 0,
                       bottom: 0,
 
@@ -291,10 +315,57 @@ const BookingCode = ({ booking }: { booking: any }) => {
 };
 
 const PaymentButton = ({ booking }: { booking: any }) => {
+  const { modalProps, formProps, show, close } = useModalForm({
+    resource: "payments",
+    action: "create",
+  });
   return (
-    <Button type="primary" size="small">
-      Payment
-    </Button>
+    <>
+      <Button
+        type="primary"
+        size="small"
+        onClick={() => {
+          show();
+        }}
+      >
+        Payment
+      </Button>
+
+      <Modal {...modalProps} width={400}>
+        <Form
+          {...formProps}
+          onFinish={(values: any) => {
+            return formProps.onFinish?.({
+              ...values,
+              booking: booking.documentId,
+              user: booking.user.id,
+            });
+          }}
+          initialValues={{
+            amount: booking.total - booking.totalPayment,
+            payment_method: "cash",
+          }}
+          layout="vertical"
+        >
+          <Form.Item name="amount" label="Amount" rules={[{ required: true }]}>
+            <InputNumber disabled />
+          </Form.Item>
+          <Form.Item name="note" label="Note">
+            <Input />
+          </Form.Item>
+          <Form.Item name="ref_code" label="Ref code">
+            <Input />
+          </Form.Item>
+          <Form.Item name="payment_method" label="Payment Method">
+            <Select>
+              <Select.Option value="cash">Tiền mặt</Select.Option>
+              <Select.Option value="debit">Nợ</Select.Option>
+              <Select.Option value="banking">Chuyển khoản</Select.Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
   );
 };
 
@@ -350,6 +421,42 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
     times.push(("00" + i).slice(-2) + ":00");
     times.push(("00" + i).slice(-2) + ":30");
   }
+
+  const timeMode = Form.useWatch("time_mode", formProps.form);
+  useEffect(() => {
+    if (timeMode === "morning") {
+      formProps.form?.setFieldsValue({
+        start_time: "08:00",
+        end_time: "12:00",
+      });
+    }
+    if (timeMode === "afternoon") {
+      formProps.form?.setFieldsValue({
+        start_time: "13:00",
+        end_time: "17:00",
+      });
+    }
+
+    if (timeMode === "allday") {
+      formProps.form?.setFieldsValue({
+        start_time: "08:00",
+        end_time: "17:00",
+      });
+    }
+  }, [timeMode]);
+
+  const bookingItems = Form.useWatch("booking_items", formProps.form) || [];
+  const date = Form.useWatch("date", formProps.form);
+  const startTime = Form.useWatch("start_time", formProps.form);
+  const endTime = Form.useWatch("end_time", formProps.form);
+  const offet = dayjs(date + " " + endTime).diff(
+    date + " " + startTime,
+    "minute"
+  );
+  const total = _.sumBy(bookingItems, "price") * (offet / 60);
+
+  const [isPayment, setIsPayment] = useState(false);
+
   return (
     <>
       <Button
@@ -368,8 +475,10 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
           initialValues={{
             date: dayjs().format("YYYY-MM-DD"),
             start_time: "08:00",
-            end_time: "08:30",
+            end_time: "12:00",
             booking_items: [{}],
+            type: "single",
+            time_mode: "morning",
           }}
           layout="vertical"
           onFinish={(values: any) => {
@@ -378,7 +487,6 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               date + " " + values.start_time,
               "minute"
             );
-            console.log("offsetTime", offsetTime);
             const booking_items = values.booking_items.map((b: any) => ({
               work_space: b.work_space,
               start_time: values.start_time,
@@ -392,13 +500,29 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               ...values,
               booking_items: booking_items,
               total: _.sumBy(booking_items, "total"),
-              totalPayment: 0,
             };
+            if (isPayment) {
+              dataSend.totalPayment = {
+                note: values.payment?.note,
+                ref_code: values.payment?.ref_code,
+                payment_method: values.payment?.payment_method,
+              };
+            }
             return formProps.onFinish?.(dataSend);
           }}
         >
           <Row gutter={[12, 0]}>
-            <Col span={12}>
+            <Col span={4}>
+              <Form.Item name="type" label="Type" rules={[{ required: true }]}>
+                <Select>
+                  <Select.Option value="single">Single</Select.Option>
+                  <Select.Option value="subscription">
+                    Subscription
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
               <Form.Item
                 name="date"
                 label="Date"
@@ -408,7 +532,21 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 <DatePicker />
               </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
+              <Form.Item
+                name="time_mode"
+                label="Time mode"
+                rules={[{ required: true }]}
+              >
+                <Select>
+                  <Select.Option value="morning">Morning</Select.Option>
+                  <Select.Option value="afternoon">Afternoon</Select.Option>
+                  <Select.Option value="allday">All day</Select.Option>
+                  <Select.Option value="custom">Custom</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={4}>
               <Form.Item
                 name="start_time"
                 label="Start time"
@@ -423,7 +561,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <Form.Item
                 name="end_time"
                 label="End time"
@@ -529,6 +667,63 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                     </>
                   )}
                 </Form.List>
+              </Card>
+              <br />
+            </Col>
+            <Col span={10}>
+              <Card title="Summary" size="small">
+                <p>Total time: {offet} min</p>
+                <p>
+                  Total payment: {total}USD ={" "}
+                  <NumberField value={total * 25000} />
+                  VND
+                </p>
+                <p>Total seat/room: {bookingItems?.length}</p>
+                <Divider />
+
+                <Form.Item name="description" label="Note">
+                  <Input.TextArea />
+                </Form.Item>
+              </Card>
+            </Col>
+            <Col span={14}>
+              <Card
+                title={
+                  <Space>
+                    <Switch
+                      size="small"
+                      checked={isPayment}
+                      onChange={() => setIsPayment(!isPayment)}
+                      title="Payment"
+                    />
+                    Payment
+                  </Space>
+                }
+                size="small"
+              >
+                {isPayment && (
+                  <>
+                    <Form.Item name={["payment", "ref_code"]} label="Ref code">
+                      <Input />
+                    </Form.Item>
+                    <Form.Item
+                      name={["payment", "payment_method"]}
+                      label="Payment Method"
+                      rules={[{ required: true }]}
+                    >
+                      <Select>
+                        <Select.Option value="cash">Tiền mặt</Select.Option>
+                        <Select.Option value="debit">Nợ</Select.Option>
+                        <Select.Option value="banking">
+                          Chuyển khoản
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+                    <Form.Item name={["payment", "note"]} label="Note">
+                      <Input.TextArea />
+                    </Form.Item>
+                  </>
+                )}
               </Card>
             </Col>
           </Row>

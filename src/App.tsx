@@ -27,6 +27,16 @@ import { DataProvider } from "./dataProvider";
 import { SpaceCreate, SpaceList, SpaceShow } from "./pages/spaces";
 import { useEffect } from "react";
 import { Board } from "./pages/board";
+import "./style.css";
+import {
+  ControlFilled,
+  GroupOutlined,
+  MonitorOutlined,
+  RadarChartOutlined,
+  TableOutlined,
+  UsergroupAddOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 
 function App() {
   document.title = "LaSpace | Admin";
@@ -49,6 +59,10 @@ function App() {
                   {
                     name: "board",
                     list: "/board",
+                    meta: {
+                      label: "Board",
+                      icon: <ControlFilled />,
+                    },
                   },
                   {
                     name: "users",
@@ -58,6 +72,8 @@ function App() {
                     show: "/users/show/:id",
                     meta: {
                       canDelete: true,
+                      label: "Members",
+                      icon: <UserOutlined />,
                     },
                   },
                   {
@@ -68,6 +84,8 @@ function App() {
                     show: "/spaces/show/:id",
                     meta: {
                       canDelete: true,
+                      label: "Spaces / Rooms",
+                      icon: <RadarChartOutlined />,
                     },
                   },
                   {
@@ -78,6 +96,8 @@ function App() {
                     show: "/bookings/show/:id",
                     meta: {
                       canDelete: true,
+                      label: "Bookings",
+                      icon: <TableOutlined />,
                     },
                   },
                 ]}
