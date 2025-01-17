@@ -25,6 +25,7 @@ import { start } from "repl";
 import _ from "lodash";
 import { PlusOutlined } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
+import ButtonGroup from "antd/es/button/button-group";
 
 const { Title } = Typography;
 
@@ -53,29 +54,6 @@ export const Board = () => {
   });
   const bookings = data?.data || [];
 
-  const { data: dataSpaces } = useList({
-    resource: "spaces",
-    meta: {
-      populate: "*",
-    },
-    pagination: {
-      pageSize: 100,
-    },
-  });
-
-  const { data: dataWorksSpaces } = useList({
-    resource: "work-spaces",
-    meta: {
-      populate: "*",
-    },
-    pagination: {
-      pageSize: 100,
-    },
-  });
-
-  const spaces = dataSpaces?.data || [];
-  const workSpaces = dataWorksSpaces?.data || [];
-
   const renderDate = (date: any) => {
     let bookingList = bookings.filter((b: any) => b.date === date);
     bookingList = _.uniqBy(bookingList, "booking.code");
@@ -87,7 +65,6 @@ export const Board = () => {
       </div>
     );
   };
-  const [zoom, setZoom] = useState(1);
   return (
     <Show
       title="Board"
@@ -145,87 +122,134 @@ export const Board = () => {
           </Card>
         </Col>
         <Col span={24}>
-          <Card
-            title={
-              <Space size="small">
-                <Title level={5} style={{ margin: 0, marginRight: 24 }}>
-                  Map
-                </Title>
-                <Button size="small" onClick={() => setZoom(zoom - 0.01)}>
-                  -
-                </Button>
-                <InputNumber
-                  value={Math.round(zoom * 100)}
-                  suffix="%"
-                  onChange={(value) => {
-                    setZoom((value || 0) / 100);
-                  }}
-                />
-                <Button size="small" onClick={() => setZoom(zoom + 0.01)}>
-                  +
-                </Button>
-              </Space>
-            }
-            size="small"
-          >
-            {spaces.map((s: any) => {
-              const bg = API_URL + s.background?.url || "";
-              return (
-                <div key={s.id}>
-                  <Title level={5}>{s.name}</Title>
-                  <div
-                    id="space"
-                    style={{
-                      overflow: "auto",
-                      marginBottom: "24px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: s.width * 100 * zoom + "px",
-                        height: s.height * 100 * zoom + "px",
-                        backgroundImage: `url(${bg})`,
-                        backgroundRepeat: "no-repeat",
-                        backgroundColor: "yellow",
-                        backgroundSize: "100% auto",
-                        position: "relative",
-                      }}
-                    >
-                      {workSpaces
-                        .filter((a) => a.space?.id == s.id)
-                        .map((workspace: any) => {
-                          const colors: any = {
-                            seat: "red",
-                            meeting_room: "blue",
-                            conference_room: "green",
-                            lounge: "yellow",
-                          };
-                          return (
-                            <div
-                              key={workspace.id}
-                              id={`workspace-${workspace.id}`}
-                              style={{
-                                position: "absolute",
-                                left: workspace.position_x * 100 * zoom + "px",
-                                top: workspace.position_y * 100 * zoom + "px",
-                                width: workspace.width * 100 * zoom + "px",
-                                height: workspace.height * 100 * zoom + "px",
-                                background: colors[workspace.type] ?? "black",
-                                opacity: 0.6,
-                              }}
-                              draggable
-                            ></div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </Card>
+          <Map />
         </Col>
       </Row>
     </Show>
+  );
+};
+const Map = () => {
+  const { data: dataSpaces } = useList({
+    resource: "spaces",
+    meta: {
+      populate: "*",
+    },
+    pagination: {
+      pageSize: 100,
+    },
+  });
+
+  const { data: dataWorksSpaces } = useList({
+    resource: "work-spaces",
+    meta: {
+      populate: "*",
+    },
+    pagination: {
+      pageSize: 100,
+    },
+  });
+
+  const spaces = dataSpaces?.data || [];
+  const workSpaces = dataWorksSpaces?.data || [];
+  const [zoom, setZoom] = useState(1);
+
+  const [wordspaceId, setWorkSpaceId] = useState(0);
+  return (
+    <Card
+      title={
+        <Space size="small">
+          <Title level={5} style={{ margin: 0, marginRight: 24 }}>
+            Map
+          </Title>
+          <Button size="small" onClick={() => setZoom(zoom - 0.01)}>
+            -
+          </Button>
+          <InputNumber
+            value={Math.round(zoom * 100)}
+            suffix="%"
+            onChange={(value) => {
+              setZoom((value || 0) / 100);
+            }}
+          />
+          <Button size="small" onClick={() => setZoom(zoom + 0.01)}>
+            +
+          </Button>
+        </Space>
+      }
+      extra={
+        <ButtonGroup style={{ marginRight: 10 }}>
+          {spaces.map((s: any) => {
+            return (
+              <Button
+                key={s.id}
+                onClick={() => setWorkSpaceId(s.id)}
+                type={wordspaceId === s.id ? "primary" : "default"}
+              >
+                {s.name}
+              </Button>
+            );
+          })}
+        </ButtonGroup>
+      }
+      size="small"
+    >
+      {spaces
+        .filter((a) => a.id == wordspaceId)
+        .map((s: any) => {
+          const bg = API_URL + s.background?.url || "";
+          return (
+            <div key={s.id}>
+              <Title level={5}>{s.name}</Title>
+              <div
+                id="space"
+                style={{
+                  overflow: "auto",
+                  marginBottom: "24px",
+                }}
+              >
+                <div
+                  style={{
+                    width: s.width * 100 * zoom + "px",
+                    height: s.height * 100 * zoom + "px",
+                    backgroundImage: `url(${bg})`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundColor: "yellow",
+                    backgroundSize: "100% auto",
+                    position: "relative",
+                  }}
+                >
+                  {workSpaces
+                    .filter((a) => a.space?.id == s.id)
+                    .map((workspace: any) => {
+                      const colors: any = {
+                        seat: "red",
+                        meeting_room: "blue",
+                        conference_room: "green",
+                        lounge: "yellow",
+                      };
+                      return (
+                        <div
+                          key={workspace.id}
+                          id={`workspace-${workspace.id}`}
+                          style={{
+                            position: "absolute",
+                            left: workspace.position_x * 100 * zoom + "px",
+                            top: workspace.position_y * 100 * zoom + "px",
+                            width: workspace.width * 100 * zoom + "px",
+                            height: workspace.height * 100 * zoom + "px",
+                            background: colors[workspace.type] ?? "black",
+                            opacity: 0.6,
+                          }}
+                          draggable
+                        ></div>
+                      );
+                    })}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+    </Card>
   );
 };
 
