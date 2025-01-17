@@ -24,7 +24,6 @@ import {
 import { useEffect, useState } from "react";
 import { API_URL } from "../constants";
 import dayjs from "dayjs";
-import { start } from "repl";
 import _ from "lodash";
 import { PlusOutlined } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
@@ -36,7 +35,7 @@ export const Board = () => {
   const { data, refetch } = useList({
     resource: "bookings",
     meta: {
-      populate: ["user", "booking_items.work_space.space"],
+      populate: ["user", "booking_items.work_space.space", "payments"],
     },
     pagination: {
       pageSize: 100,
@@ -258,25 +257,51 @@ const Map = () => {
                     .filter((a) => a.space?.id == s.id)
                     .map((workspace: any) => {
                       const colors: any = {
-                        seat: "red",
-                        meeting_room: "blue",
-                        conference_room: "green",
-                        lounge: "yellow",
+                        seat: "#f50",
+                        meeting_room: "#2db7f5",
+                        conference_room: "#87d068",
+                        lounge: "#108ee9",
                       };
                       return (
-                        <div
+                        <Popover
                           key={workspace.id}
-                          id={`workspace-${workspace.id}`}
-                          style={{
-                            position: "absolute",
-                            left: workspace.position_x * 100 * zoom + "px",
-                            top: workspace.position_y * 100 * zoom + "px",
-                            width: workspace.width * 100 * zoom + "px",
-                            height: workspace.height * 100 * zoom + "px",
-                            background: colors[workspace.type] ?? "black",
-                          }}
-                          draggable
-                        ></div>
+                          title={workspace.name}
+                          content={
+                            <div>
+                              <p>Type: {workspace.type}</p>
+                              <p>Price: {workspace.price_per_hour} USD</p>
+                              <p>Bookings</p>
+                            </div>
+                          }
+                        >
+                          <div
+                            id={`workspace-${workspace.id}`}
+                            style={{
+                              position: "absolute",
+                              left: workspace.position_x * 100 * zoom + "px",
+                              top: workspace.position_y * 100 * zoom + "px",
+                              width: workspace.width * 100 * zoom + "px",
+                              height: workspace.height * 100 * zoom + "px",
+                              background: colors[workspace.type] ?? "black",
+                              padding: "4px",
+                              opacity: 0.8,
+                            }}
+                          >
+                            <div>
+                              <p style={{ margin: 0 }}>
+                                Type: <b>{workspace.type}</b>
+                              </p>
+                              <p style={{ margin: 0 }}>
+                                Price: {workspace.price_per_hour} USD ={" "}
+                                <NumberField
+                                  value={workspace.price_per_hour * 25000}
+                                />{" "}
+                                VND
+                              </p>
+                              <p style={{ margin: 0 }}>Bookings</p>
+                            </div>
+                          </div>
+                        </Popover>
                       );
                     })}
                 </div>
@@ -306,6 +331,23 @@ const BookingCode = ({ booking }: { booking: any }) => {
           <p>Status: {booking.state}</p>
           <p>Total: {booking.total}</p>
           <p>Total Payment: {booking.totalPayment}</p>
+          <p> Items</p>
+          <ul>
+            {booking.booking_items.map((bi: any, idx: number) => (
+              <li key={bi.id}>
+                {bi.work_space?.name} - {bi.start_time} - {bi.end_time} -{" "}
+                {bi.total} USD
+              </li>
+            ))}
+          </ul>
+          <p>Payments</p>
+          <ul>
+            {booking.payments.map((p: any, idx: number) => (
+              <li key={p.id}>
+                {p.amount} USD - {p.payment_method}
+              </li>
+            ))}
+          </ul>
         </Card>
       }
     >
