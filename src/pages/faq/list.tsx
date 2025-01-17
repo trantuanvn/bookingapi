@@ -35,8 +35,11 @@ export const FAQList = () => {
           width={100}
           render={(_, record: BaseRecord) => (
             <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
-              <ShowButton hideText size="small" recordItemId={record.id} />
+              <EditButton
+                hideText
+                size="small"
+                recordItemId={record.documentId}
+              />
             </Space>
           )}
         />

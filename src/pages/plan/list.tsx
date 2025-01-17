@@ -19,12 +19,11 @@ export const PlanList = () => {
 
   return (
     <List breadcrumb={null}>
-      <Table {...tableProps} rowKey="id">
+      <Table {...tableProps} rowKey="documentId">
+        <Table.Column dataIndex="code" title={"Code"} />
         <Table.Column dataIndex="name" title={"Name"} />
         <Table.Column dataIndex="price" title={"Price"} />
-        <Table.Column dataIndex="discount" title={"Discount"} />
         <Table.Column dataIndex="description" title={"Mô tả"} />
-        <Table.Column dataIndex="code" title={"Code"} />
         <Table.Column dataIndex="color" title={"Color"} />
 
         <Table.Column
@@ -38,8 +37,11 @@ export const PlanList = () => {
           width={100}
           render={(_, record: BaseRecord) => (
             <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
-              <ShowButton hideText size="small" recordItemId={record.id} />
+              <EditButton
+                hideText
+                size="small"
+                recordItemId={record.documentId}
+              />
             </Space>
           )}
         />

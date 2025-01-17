@@ -18,14 +18,18 @@ export const PostList = () => {
   });
 
   return (
-    <List>
+    <List breadcrumb={null}>
       <Table {...tableProps} rowKey="id">
         <Table.Column dataIndex="title" title={"Title"} />
-        <Table.Column dataIndex="content" title={"Content"} />
+        {/* <Table.Column dataIndex="content" title={"Content"} /> */}
         <Table.Column dataIndex="description" title={"Description"} />
-        <Table.Column dataIndex="date" title={"Date"} />
-        <Table.Column dataIndex="author" title={"Author"} />
-        <Table.Column dataIndex="thumnail" title={"Thumbnail"} />
+        <Table.Column
+          dataIndex="date"
+          title={"Date"}
+          render={(value: any) => <DateField value={value} />}
+        />
+        {/* <Table.Column dataIndex="author" title={"Author"} /> */}
+        {/* <Table.Column dataIndex="thumnail" title={"Thumbnail"} /> */}
         <Table.Column dataIndex="banner" title={"Banner"} />
 
         <Table.Column
@@ -39,8 +43,11 @@ export const PostList = () => {
           width={100}
           render={(_, record: BaseRecord) => (
             <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
-              <ShowButton hideText size="small" recordItemId={record.id} />
+              <EditButton
+                hideText
+                size="small"
+                recordItemId={record.documentId}
+              />
             </Space>
           )}
         />

@@ -41,6 +41,9 @@ import { PostList } from "./pages/post/list";
 import { PlanList } from "./pages/plan/list";
 import { ContactList } from "./pages/contact/list";
 import { FAQList } from "./pages/faq/list";
+import { PlanCreate } from "./pages/plan/create";
+import { PostCreate } from "./pages/post/create";
+import { FAQCreate } from "./pages/faq/create";
 
 function App() {
   document.title = "LaSpace | Admin";
@@ -146,9 +149,9 @@ function App() {
                   {
                     name: "contacts",
                     list: "/contacts",
-                    create: "/contacts/create",
-                    edit: "/contacts/edit/:id",
-                    show: "/contacts/show/:id",
+                    // create: "/contacts/create",
+                    // edit: "/contacts/edit/:id",
+                    // show: "/contacts/show/:id",
                     meta: {
                       parent: "Content",
                       canDelete: true,
@@ -216,9 +219,22 @@ function App() {
                       <Route path="edit/:id" element={<UserCreate />} />
                       <Route path="show/:id" element={<UserShow />} />
                     </Route>
-                    <Route path="/posts" element={<PostList />} />
-                    <Route path="/plans" element={<PlanList />} />
-                    <Route path="/faqs" element={<FAQList />} />
+                    <Route path="/posts">
+                      <Route index element={<PostList />} />
+                      <Route path="create" element={<PostCreate />} />
+                      <Route path="edit/:id" element={<PostCreate />} />
+                    </Route>
+                    <Route path="/plans">
+                      <Route index element={<PlanList />} />
+                      <Route path="create" element={<PlanCreate />} />
+                      <Route path="edit/:id" element={<PlanCreate />} />
+                      {/* <Route path="show/:id" element={<PlanShow />} /> */}
+                    </Route>
+                    <Route path="/faqs">
+                      <Route index element={<FAQList />} />
+                      <Route path="create" element={<FAQCreate />} />
+                      <Route path="edit/:id" element={<FAQCreate />} />
+                    </Route>
                     <Route path="/contacts" element={<ContactList />} />
 
                     <Route path="*" element={<ErrorComponent />} />
