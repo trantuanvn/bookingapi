@@ -37,6 +37,10 @@ import {
   UsergroupAddOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { PostList } from "./pages/post/list";
+import { PlanList } from "./pages/plan/list";
+import { ContactList } from "./pages/contact/list";
+import { FAQList } from "./pages/faq/list";
 
 function App() {
   document.title = "LaSpace | Admin";
@@ -100,6 +104,58 @@ function App() {
                       icon: <TableOutlined />,
                     },
                   },
+                  {
+                    name: "plans",
+                    list: "/plans",
+                    create: "/plans/create",
+                    edit: "/plans/edit/:id",
+                    show: "/plans/show/:id",
+                    meta: {
+                      parent: "Content",
+                      canDelete: true,
+                      label: "Plan",
+                      icon: <TableOutlined />,
+                    },
+                  },
+                  {
+                    name: "posts",
+                    list: "/posts",
+                    create: "/posts/create",
+                    edit: "/posts/edit/:id",
+                    show: "/posts/show/:id",
+                    meta: {
+                      parent: "Content",
+                      canDelete: true,
+                      label: "Post",
+                      icon: <TableOutlined />,
+                    },
+                  },
+                  {
+                    name: "faqs",
+                    list: "/faqs",
+                    create: "/faqs/create",
+                    edit: "/faqs/edit/:id",
+                    show: "/faqs/show/:id",
+                    meta: {
+                      parent: "Content",
+                      canDelete: true,
+                      label: "FAQ",
+                      icon: <TableOutlined />,
+                    },
+                  },
+                  {
+                    name: "contacts",
+                    list: "/contacts",
+                    create: "/contacts/create",
+                    edit: "/contacts/edit/:id",
+                    show: "/contacts/show/:id",
+                    meta: {
+                      parent: "Content",
+                      canDelete: true,
+                      label: "Contacts",
+                      icon: <TableOutlined />,
+                    },
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -160,6 +216,10 @@ function App() {
                       <Route path="edit/:id" element={<UserCreate />} />
                       <Route path="show/:id" element={<UserShow />} />
                     </Route>
+                    <Route path="/posts" element={<PostList />} />
+                    <Route path="/plans" element={<PlanList />} />
+                    <Route path="/faqs" element={<FAQList />} />
+                    <Route path="/contacts" element={<ContactList />} />
 
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
