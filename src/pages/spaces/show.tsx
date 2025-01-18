@@ -396,12 +396,12 @@ export const SpaceShow = () => {
           </Form.Item>
           <Form.Item label="Type" name="type">
             <Select>
-              <Select.Option value="seat">Bàn</Select.Option>
-              <Select.Option value="meeting_room">ng họp</Select.Option>
+              <Select.Option value="seat_desk">Bàn</Select.Option>
+              <Select.Option value="meeting_room">Phòng họp</Select.Option>
               <Select.Option value="conference_room">
                 Phòng hội nghị
               </Select.Option>
-              <Select.Option value="lounge">Phòng chờ</Select.Option>
+              <Select.Option value="lounge_desk">Phòng chờ</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item label="Code" name="code">

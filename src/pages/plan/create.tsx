@@ -61,6 +61,26 @@ export const PlanCreate = () => {
               <Input type="color" />
             </Form.Item>
           </Col>
+          <Col span={6}>
+            <Form.Item
+              label={"Loại bàn / phòng"}
+              name={["allow_work_space"]}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <Select mode="multiple">
+                <Select.Option value="seat_desk">Bàn</Select.Option>
+                <Select.Option value="meeting_room">Phòng họp</Select.Option>
+                <Select.Option value="conference_room">
+                  Phòng hội nghị
+                </Select.Option>
+                <Select.Option value="lounge_desk">Phòng chờ</Select.Option>
+              </Select>
+            </Form.Item>
+          </Col>
           <Col span={24}>
             <Form.Item
               label={"Description"}
@@ -72,7 +92,6 @@ export const PlanCreate = () => {
               ]}
             >
               <Input.TextArea />
-              {/* <MDEditor data-color-mode="light" /> */}
             </Form.Item>
           </Col>
         </Row>

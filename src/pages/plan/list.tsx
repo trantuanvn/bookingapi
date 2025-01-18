@@ -25,6 +25,11 @@ export const PlanList = () => {
         <Table.Column dataIndex="price" title={"Price"} />
         <Table.Column dataIndex="description" title={"Mô tả"} />
         <Table.Column dataIndex="color" title={"Color"} />
+        <Table.Column dataIndex="allow_work_space" title={"Allow booking"} />
+        <Table.Column
+          dataIndex="max_booking_per_week"
+          title={"Đặt chỗ/ Tuần"}
+        />
 
         <Table.Column
           dataIndex={["createdAt"]}
