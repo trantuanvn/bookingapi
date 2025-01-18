@@ -8,13 +8,23 @@ import {
   useTable,
 } from "@refinedev/antd";
 import { type BaseRecord, useMany } from "@refinedev/core";
-import { Avatar, Space, Table } from "antd";
+import { Avatar, Image, Space, Table } from "antd";
 import { API_URL } from "../../constants";
 
 export const PostList = () => {
   const { tableProps } = useTable({
     syncWithLocation: true,
-    meta: {},
+    meta: {
+      populate: "*",
+    },
+    sorters: {
+      initial: [
+        {
+          field: "createdAt",
+          order: "desc",
+        },
+      ],
+    },
   });
 
   return (
@@ -28,13 +38,18 @@ export const PostList = () => {
           title={"Date"}
           render={(value: any) => <DateField value={value} />}
         />
-        {/* <Table.Column dataIndex="author" title={"Author"} /> */}
-        {/* <Table.Column dataIndex="thumnail" title={"Thumbnail"} /> */}
-        <Table.Column dataIndex="banner" title={"Banner"} />
+        <Table.Column
+          dataIndex="banner"
+          title={"Banner"}
+          render={(value: any) => (
+            <Image src={API_URL + value.url} height={60} />
+          )}
+        />
 
         <Table.Column
           dataIndex={["createdAt"]}
           title={"Created at"}
+          width={150}
           render={(value: any) => <DateField value={value} />}
         />
         <Table.Column
@@ -47,6 +62,11 @@ export const PostList = () => {
                 hideText
                 size="small"
                 recordItemId={record.documentId}
+              />
+              <DeleteButton
+                recordItemId={record.documentId}
+                size="small"
+                hideText
               />
             </Space>
           )}
