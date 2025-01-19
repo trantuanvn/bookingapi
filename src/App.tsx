@@ -1,4 +1,4 @@
-import { Authenticated, Refine } from "@refinedev/core";
+import { Authenticated, NotificationProvider, Refine } from "@refinedev/core";
 import { DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbarProvider } from "@refinedev/kbar";
 
@@ -15,7 +15,7 @@ import routerBindings, {
   CatchAllNavigate,
   NavigateToResource,
 } from "@refinedev/react-router-v6";
-import { App as AntdApp, Typography } from "antd";
+import { App as AntdApp, notification, Typography } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { authProvider, axiosInstance } from "./authProvider";
 import { Header } from "./components/header";
@@ -50,6 +50,20 @@ function App() {
   useEffect(() => {
     localStorage.setItem("colorMode", "dark");
   }, []);
+
+  const notificationProvider: NotificationProvider = {
+    open: (e) => {
+      notification.open({
+        message: e.message,
+        description: e.description,
+        placement: "top",
+        // type: e.type,
+      });
+    },
+    close: () => {
+      notification.destroy();
+    },
+  };
   return (
     <BrowserRouter>
       {/* <GitHubBanner /> */}
@@ -60,7 +74,7 @@ function App() {
               <Refine
                 authProvider={authProvider}
                 dataProvider={DataProvider(API_URL + `/api`, axiosInstance)}
-                notificationProvider={useNotificationProvider}
+                notificationProvider={notificationProvider}
                 routerProvider={routerBindings}
                 resources={[
                   {

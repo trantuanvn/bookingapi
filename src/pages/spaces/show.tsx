@@ -35,6 +35,7 @@ import UploadFile from "../../components/image";
 import { API_URL } from "../../constants";
 import { useState } from "react";
 import { SaveOutlined, UploadOutlined } from "@ant-design/icons";
+import ButtonGroup from "antd/es/button/button-group";
 
 const { Title } = Typography;
 
@@ -62,22 +63,31 @@ export const SpaceShow = () => {
         value: id,
       },
     ],
+    pagination: {
+      pageSize: 10000,
+    }
   });
   const workspaces = workspacesData?.data || [];
 
-  const addWorkspace = () => {
+  const addWorkspace = (type: string) => {
+    const nameObj: any = {
+      coworking_desk: "Bàn chung",
+      lounge_desk: "Bàn riêng",
+      meeting_room: "Phòng họp",
+      conference_room: "Phòng hội nghị",
+    };
     mutate({
       resource: "work-spaces",
       values: {
-        name: "Seat",
-        code: "SEAT_1",
+        name: nameObj[type] || "Bàn chung",
+        code: "WS_" + Math.random().toString(36).substring(7),
         space: data.id,
-        width: 2,
-        height: 2,
-        position_x: 0,
-        position_y: 0,
-        type: "seat",
-        price_per_hour: 10, // 10USD per hour
+        width: 1,
+        height: 1,
+        position_x: 2,
+        position_y: 2,
+        type: type || "coworking_desk",
+        price_per_hour: 5,
       },
     });
   };
@@ -128,13 +138,36 @@ export const SpaceShow = () => {
             >
               <Button icon={<UploadOutlined />}>Hình nền</Button>
             </UploadFile>
-            <Button
-              onClick={() => {
-                addWorkspace();
-              }}
-            >
-              Thêm workspace
-            </Button>
+            <ButtonGroup>
+              <Button
+                onClick={() => {
+                  addWorkspace("coworking_desk");
+                }}
+              >
+                + Workspace
+              </Button>
+              <Button
+                onClick={() => {
+                  addWorkspace("lounge_desk");
+                }}
+              >
+                + Lonuge
+              </Button>
+              <Button
+                onClick={() => {
+                  addWorkspace("meeting_room");
+                }}
+              >
+                + Metting room
+              </Button>
+              <Button
+                onClick={() => {
+                  addWorkspace("conference_room");
+                }}
+              >
+                + Conference room
+              </Button>
+            </ButtonGroup>
           </Space>
         }
       >
@@ -249,7 +282,9 @@ export const SpaceShow = () => {
           <Table.Column dataIndex="position_y" title={"Y"} />
           <Table.Column dataIndex="width" title={"Width"} />
           <Table.Column dataIndex="height" title={"Height"} />
-          <Table.Column dataIndex="price_per_hour" title={"Giá"} />
+          <Table.Column dataIndex="price_per_hour" title={"Giá (giờ)"} />
+          <Table.Column dataIndex="price_per_day" title={"Giá (ngày)"} />
+          <Table.Column dataIndex="price_half_day" title={"Giá (nửa ngày)"} />
 
           <Table.Column
             width={200}
@@ -417,6 +452,13 @@ export const SpaceShow = () => {
           </Form.Item>
 
           <Form.Item label="Giá" name="price_per_hour">
+            <InputNumber width="100%" />
+          </Form.Item>
+          <Form.Item label="Giá (ngày)" name="price_per_day">
+            <InputNumber width="100%" />
+          </Form.Item>
+
+          <Form.Item label="Giá (nửa ngày)" name="price_half_day">
             <InputNumber width="100%" />
           </Form.Item>
         </Form>
