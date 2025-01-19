@@ -231,14 +231,14 @@ export const SpaceShow = () => {
             title={"Type"}
             render={(text) => {
               switch (text) {
-                case "seat":
-                  return "Bàn";
+                case "coworking_desk":
+                  return "Bàn chung";
                 case "meeting_room":
                   return "Phòng họp";
                 case "conference_room":
                   return "Phòng hội nghị";
-                case "lounge":
-                  return "Phòng chờ";
+                case "lounge_desk":
+                  return "Bàn riêng";
                 default:
                   return text;
               }
@@ -398,7 +398,7 @@ export const SpaceShow = () => {
             <Select>
               <Select.Option value="coworking_desk">Bàn chung</Select.Option>
               <Select.Option value="lounge_desk">Bàn riêng</Select.Option>
-              
+
               <Select.Option value="meeting_room">Phòng họp</Select.Option>
               <Select.Option value="conference_room">
                 Phòng hội nghị

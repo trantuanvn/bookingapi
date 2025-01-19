@@ -102,12 +102,3 @@ export const PlanList = () => {
     </List>
   );
 };
-
-{
-  /* <Select.Option value="coworking_desk">Bàn chung</Select.Option>
-<Select.Option value="lounge_desk">Bàn riêng</Select.Option>
-<Select.Option value="meeting_room">Phòng họp</Select.Option>
-<Select.Option value="conference_room">
-  Phòng hội nghị
-</Select.Option> */
-}
