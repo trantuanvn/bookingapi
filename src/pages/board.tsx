@@ -32,6 +32,7 @@ import ButtonGroup from "antd/es/button/button-group";
 const { Title } = Typography;
 
 export const Board = () => {
+  const [month, setMonth] = useState(dayjs().format("YYYY-MM-01"));
   const { data, refetch } = useList({
     resource: "bookings",
     meta: {
@@ -44,7 +45,12 @@ export const Board = () => {
       {
         field: "booking_items.date",
         operator: "gte",
-        value: dayjs().format("YYYY-MM-DD"),
+        value: month,
+      },
+      {
+        field: "booking_items.date",
+        operator: "lte",
+        value: dayjs(month).add(1, "month").format("YYYY-MM-01"),
       },
     ],
     sorters: [
@@ -55,6 +61,8 @@ export const Board = () => {
     ],
   });
   const bookings = data?.data || [];
+
+  const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
 
   const bookingItems: any[] = [];
   bookings.forEach((b) => {
@@ -72,7 +80,16 @@ export const Board = () => {
     return (
       <div>
         {bookingList.map((b) => (
-          <BookingCode key={b.booking.code} booking={b.booking} />
+          <div
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              padding: "4px",
+              border: "1px solid #f0f0f0",
+              marginBottom: "4px",
+            }}
+          />
         ))}
       </div>
     );
@@ -93,7 +110,7 @@ export const Board = () => {
       ]}
     >
       <Row gutter={[12, 12]}>
-        <Col span={12}>
+        {/* <Col span={12}>
           <Card title="Bookings" size="small">
             <Table
               dataSource={bookings}
@@ -137,23 +154,27 @@ export const Board = () => {
               />
             </Table>
           </Card>
-        </Col>
-        <Col span={12}>
+        </Col> */}
+        <Col span={6}>
           <Card title="Calendar" size="small">
             <Calendar
               cellRender={(r) => renderDate(r.format("YYYY-MM-DD"))}
               mode="month"
+              onChange={(date) => {
+                setDate(date.format("YYYY-MM-DD"));
+                setMonth(date.format("YYYY-MM-01"));
+              }}
             />
           </Card>
         </Col>
-        <Col span={24}>
-          <Map />
+        <Col span={18}>
+          <Map date={date} bookingItems={bookingItems} />
         </Col>
       </Row>
     </Show>
   );
 };
-const Map = () => {
+const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
   const { data: dataSpaces } = useList({
     resource: "spaces",
     meta: {
@@ -174,18 +195,54 @@ const Map = () => {
     },
   });
 
+  const [mode, setMode] = useState(localStorage.getItem("modeView") || "space");
+
+  useEffect(() => {
+    localStorage.setItem("modeView", mode);
+  }, [mode]);
+
   const spaces = dataSpaces?.data || [];
   const workSpaces = dataWorksSpaces?.data || [];
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(Number(localStorage.getItem("zoom") || 1));
 
-  const [wordspaceId, setWorkSpaceId] = useState(0);
+  useEffect(() => {
+    localStorage.setItem("zoom", zoom.toString());
+  }, [zoom]);
+
+  const [wordspaceId, setWorkSpaceId] = useState(
+    spaces.length > 0 ? spaces[0].id : ""
+  );
+
+  // const allSpaces = spaces.map((s: any) => {
+  //   return {
+  //     ...s,
+  //     workSpaces: workSpaces.filter((w) => w.space?.id == s.id),
+  //   };
+  // });
+
   return (
     <Card
       title={
         <Space size="small">
-          <Title level={5} style={{ margin: 0, marginRight: 24 }}>
-            Map
-          </Title>
+          {date}
+          <ButtonGroup style={{ marginRight: 10 }}>
+            {spaces.map((s: any) => {
+              return (
+                <Button
+                  key={s.id}
+                  onClick={() => setWorkSpaceId(s.id)}
+                  type={wordspaceId === s.id ? "primary" : "default"}
+                >
+                  {s.name}
+                </Button>
+              );
+            })}
+          </ButtonGroup>
+
+          <br />
+          <br />
+          <br />
+
           <Button size="small" onClick={() => setZoom(zoom - 0.01)}>
             -
           </Button>
@@ -202,113 +259,197 @@ const Map = () => {
         </Space>
       }
       extra={
-        <ButtonGroup style={{ marginRight: 10 }}>
-          {spaces.map((s: any) => {
-            return (
-              <Button
-                key={s.id}
-                onClick={() => setWorkSpaceId(s.id)}
-                type={wordspaceId === s.id ? "primary" : "default"}
-              >
-                {s.name}
-              </Button>
-            );
-          })}
+        <ButtonGroup>
+          <Button
+            onClick={() => setMode("space")}
+            type={mode === "space" ? "primary" : "default"}
+          >
+            Sơ đồ
+          </Button>
+          <Button
+            onClick={() => setMode("time")}
+            type={mode === "time" ? "primary" : "default"}
+          >
+            Thời gian
+          </Button>
         </ButtonGroup>
       }
-      size="small"
     >
-      {spaces
-        .filter((a) => a.id == wordspaceId)
-        .map((s: any) => {
-          const bg = API_URL + s.background?.url || "";
-          return (
-            <div key={s.id}>
-              <Title level={5}>{s.name}</Title>
-              <div
-                id="space"
-                style={{
-                  overflow: "auto",
-                  marginBottom: "24px",
-                }}
-              >
+      {mode == "time" && (
+        <div>
+          <div style={{ display: "flex", marginBottom: "8px" }}>
+            <div
+              style={{
+                textAlign: "center",
+                padding: "8px",
+                width: "200px",
+              }}
+            >
+              Time
+            </div>
+            {[...Array(10).keys()].map((i) => {
+              const time = `${("00" + (i + 8)).slice(-2)}:00`;
+              return (
                 <div
                   style={{
-                    width: s.width * 100 * zoom + "px",
-                    height: s.height * 100 * zoom + "px",
-                    position: "relative",
+                    flex: 1,
+                    padding: "8px",
+                  }}
+                >
+                  {time}
+                </div>
+              );
+            })}
+          </div>
+          {workSpaces.map((a) => (
+            <div
+              key={a.id}
+              style={{
+                display: "flex",
+                marginBottom: "8px",
+                border: "1px solid #808080FF",
+              }}
+            >
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "8px",
+                  width: "200px",
+                  borderRight: "1px solid #808080FF",
+                }}
+              >
+                {a.name}
+              </div>
+              {[...Array(10).keys()].map((i) => {
+                const time = `${("00" + (i + 8)).slice(-2)}:00`;
+                return (
+                  <div
+                    style={{
+                      flex: 1,
+                      textAlign: "center",
+                    }}
+                  >
+                    {/* {time} */}
+
+                    {bookingItems
+                      .filter(
+                        (b) =>
+                          b.work_space.id == a.id &&
+                          b.date == date &&
+                          b.start_time <= time &&
+                          b.end_time >= time
+                      )
+                      .map((a) => (
+                        <div
+                          key={a.id}
+                          style={{
+                            background: "#f50",
+                            color: "white",
+                            height: 35,
+                          }}
+                        >
+                          {a.booking.code}
+                        </div>
+                      ))}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+      {mode === "space" &&
+        spaces
+          .filter((a) => a.id == wordspaceId)
+          .map((s: any) => {
+            const bg = API_URL + s.background?.url || "";
+            return (
+              <div key={s.id}>
+                <Title level={5}>{s.name}</Title>
+                <div
+                  id="space"
+                  style={{
+                    overflow: "auto",
+                    marginBottom: "24px",
                   }}
                 >
                   <div
                     style={{
-                      backgroundImage: `url(${bg})`,
-                      backgroundRepeat: "no-repeat",
-                      position: "absolute",
-                      backgroundSize: "100% 100%",
-                      top: 0,
-                      bottom: 0,
-
                       width: s.width * 100 * zoom + "px",
                       height: s.height * 100 * zoom + "px",
-                      opacity: 0.6,
+                      position: "relative",
                     }}
-                  />
-                  {workSpaces
-                    .filter((a) => a.space?.id == s.id)
-                    .map((workspace: any) => {
-                      const colors: any = {
-                        seat: "#f50",
-                        meeting_room: "#2db7f5",
-                        conference_room: "#87d068",
-                        lounge: "#108ee9",
-                      };
-                      return (
-                        <Popover
-                          key={workspace.id}
-                          title={workspace.name}
-                          content={
-                            <div>
-                              <p>Type: {workspace.type}</p>
-                              <p>Price: {workspace.price_per_hour} USD</p>
-                              <p>Bookings</p>
-                            </div>
-                          }
-                        >
-                          <div
-                            id={`workspace-${workspace.id}`}
-                            style={{
-                              position: "absolute",
-                              left: workspace.position_x * 100 * zoom + "px",
-                              top: workspace.position_y * 100 * zoom + "px",
-                              width: workspace.width * 100 * zoom + "px",
-                              height: workspace.height * 100 * zoom + "px",
-                              background: colors[workspace.type] ?? "black",
-                              padding: "4px",
-                              opacity: 0.8,
-                            }}
+                  >
+                    <div
+                      style={{
+                        backgroundImage: `url(${bg})`,
+                        backgroundRepeat: "no-repeat",
+                        position: "absolute",
+                        backgroundSize: "100% 100%",
+                        top: 0,
+                        bottom: 0,
+
+                        width: s.width * 100 * zoom + "px",
+                        height: s.height * 100 * zoom + "px",
+                        opacity: 0.6,
+                      }}
+                    />
+                    {workSpaces
+                      .filter((a) => a.space?.id == s.id)
+                      .map((workspace: any) => {
+                        const colors: any = {
+                          seat: "#f50",
+                          meeting_room: "#2db7f5",
+                          conference_room: "#87d068",
+                          lounge: "#108ee9",
+                        };
+                        return (
+                          <Popover
+                            key={workspace.id}
+                            title={workspace.name}
+                            content={
+                              <div>
+                                <p>Type: {workspace.type}</p>
+                                <p>Price: {workspace.price_per_hour} USD</p>
+                                <p>Bookings</p>
+                              </div>
+                            }
                           >
-                            <div>
-                              <p style={{ margin: 0 }}>
-                                Type: <b>{workspace.type}</b>
-                              </p>
-                              <p style={{ margin: 0 }}>
-                                Price: {workspace.price_per_hour} USD ={" "}
-                                <NumberField
-                                  value={workspace.price_per_hour * 25000}
-                                />{" "}
-                                VND
-                              </p>
-                              <p style={{ margin: 0 }}>Bookings</p>
+                            <div
+                              id={`workspace-${workspace.id}`}
+                              style={{
+                                position: "absolute",
+                                left: workspace.position_x * 100 * zoom + "px",
+                                top: workspace.position_y * 100 * zoom + "px",
+                                width: workspace.width * 100 * zoom + "px",
+                                height: workspace.height * 100 * zoom + "px",
+                                background: colors[workspace.type] ?? "black",
+                                padding: "4px",
+                                opacity: 0.8,
+                              }}
+                            >
+                              <div>
+                                <p style={{ margin: 0 }}>
+                                  Type: <b>{workspace.type}</b>
+                                </p>
+                                <p style={{ margin: 0 }}>
+                                  Price: {workspace.price_per_hour} USD ={" "}
+                                  <NumberField
+                                    value={workspace.price_per_hour * 25000}
+                                  />{" "}
+                                  VND
+                                </p>
+                                <p style={{ margin: 0 }}>Bookings</p>
+                              </div>
                             </div>
-                          </div>
-                        </Popover>
-                      );
-                    })}
+                          </Popover>
+                        );
+                      })}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
     </Card>
   );
 };
@@ -549,7 +690,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 ref_code: values.payment?.ref_code,
                 payment_method: values.payment?.payment_method,
                 state: "DONE",
-                payment_date: dayjs().format("YYYY-MM-DD HH:mm:ss"),  
+                payment_date: dayjs().format("YYYY-MM-DD HH:mm:ss"),
               };
             }
             return formProps.onFinish?.(dataSend);

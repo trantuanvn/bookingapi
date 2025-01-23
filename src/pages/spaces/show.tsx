@@ -33,14 +33,19 @@ import {
 import { useParams } from "react-router-dom";
 import UploadFile from "../../components/image";
 import { API_URL } from "../../constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SaveOutlined, UploadOutlined } from "@ant-design/icons";
 import ButtonGroup from "antd/es/button/button-group";
 
 const { Title } = Typography;
 
 export const SpaceShow = () => {
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(Number(localStorage.getItem("zoom") || 1));
+
+  useEffect(() => {
+    localStorage.setItem("zoom", zoom.toString());
+  }, [zoom]);
+
   const { id } = useParams();
   const { query } = useShow({
     meta: {
@@ -65,7 +70,7 @@ export const SpaceShow = () => {
     ],
     pagination: {
       pageSize: 10000,
-    }
+    },
   });
   const workspaces = workspacesData?.data || [];
 
