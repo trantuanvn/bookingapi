@@ -110,7 +110,22 @@ export const Board = () => {
       ]}
     >
       <Row gutter={[12, 12]}>
-        {/* <Col span={12}>
+        <Col span={6}>
+          <Card title="Calendar" size="small">
+            <Calendar
+              cellRender={(r) => renderDate(r.format("YYYY-MM-DD"))}
+              mode="month"
+              onChange={(date) => {
+                setDate(date.format("YYYY-MM-DD"));
+                setMonth(date.format("YYYY-MM-01"));
+              }}
+            />
+          </Card>
+        </Col>
+        <Col span={18}>
+          <Map date={date} bookingItems={bookingItems} />
+        </Col>
+        <Col span={24}>
           <Card title="Bookings" size="small">
             <Table
               dataSource={bookings}
@@ -154,21 +169,6 @@ export const Board = () => {
               />
             </Table>
           </Card>
-        </Col> */}
-        <Col span={6}>
-          <Card title="Calendar" size="small">
-            <Calendar
-              cellRender={(r) => renderDate(r.format("YYYY-MM-DD"))}
-              mode="month"
-              onChange={(date) => {
-                setDate(date.format("YYYY-MM-DD"));
-                setMonth(date.format("YYYY-MM-01"));
-              }}
-            />
-          </Card>
-        </Col>
-        <Col span={18}>
-          <Map date={date} bookingItems={bookingItems} />
         </Col>
       </Row>
     </Show>
