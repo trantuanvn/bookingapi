@@ -23,6 +23,7 @@ export const UserCreate = () => {
       title="Tạo người dùng mới"
     >
       <Form
+        style={{ width: "500px", margin: "auto" }}
         {...formProps}
         layout="vertical"
         initialValues={{
@@ -37,7 +38,7 @@ export const UserCreate = () => {
         }}
       >
         <Form.Item
-          label={"Username"}
+          label={"Tên đăng nhập"}
           name={["username"]}
           rules={[
             {
@@ -47,10 +48,10 @@ export const UserCreate = () => {
         >
           <Input />
         </Form.Item>
-        <Form.Item label={"Fullname"} name={["fullName"]}>
+        <Form.Item label={"Tên đầy đủ"} name={["fullName"]}>
           <Input />
         </Form.Item>
-        <Form.Item label={"Phonenumber"} name={["phoneNumber"]}>
+        <Form.Item label={"Số điện thoại"} name={["phoneNumber"]}>
           <Input />
         </Form.Item>
         <Form.Item
@@ -67,7 +68,7 @@ export const UserCreate = () => {
         {!id && (
           <>
             <Form.Item
-              label={"email"}
+              label={"Email"}
               name={["email"]}
               rules={[
                 {
@@ -78,7 +79,7 @@ export const UserCreate = () => {
               <Input type="email" />
             </Form.Item>
             <Form.Item
-              label={"password"}
+              label={"Mật khẩu"}
               name={["password"]}
               rules={[
                 {
@@ -91,7 +92,7 @@ export const UserCreate = () => {
           </>
         )}
         <Form.Item
-          label={"role"}
+          label={"Chức danh"}
           name={["role"]}
           rules={[
             {

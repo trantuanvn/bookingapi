@@ -822,10 +822,10 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                                 {...field}
                                 key={field.key}
                                 rules={[{ required: true }]}
-                                label="Price per hour"
+                                label="Giá"
                                 name={[field.name, "price"]}
                               >
-                                <InputNumber />
+                                <InputNumber suffix="USD" />
                               </Form.Item>
                             </Col>
                             <Col span={4}>
