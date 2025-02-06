@@ -36,6 +36,7 @@ import { API_URL } from "../../constants";
 import { useEffect, useState } from "react";
 import { SaveOutlined, UploadOutlined } from "@ant-design/icons";
 import ButtonGroup from "antd/es/button/button-group";
+import _ from "lodash";
 
 const { Title } = Typography;
 
@@ -93,6 +94,8 @@ export const SpaceShow = () => {
         position_y: 2,
         type: type || "coworking_desk",
         price_per_hour: 5,
+        price_per_day: 30,
+        price_half_day: 20,
       },
     });
   };
@@ -100,12 +103,13 @@ export const SpaceShow = () => {
   const {
     formProps: formPropsEditWSP,
     modalProps,
-
     show,
   } = useModalForm({
     resource: "work-spaces",
     action: "edit",
   });
+
+  const [dragId, setDragId] = useState("");
 
   return (
     <Show breadcrumb={null} title="Chi tiết khu vực" headerButtons={[]}>
@@ -149,14 +153,14 @@ export const SpaceShow = () => {
                   addWorkspace("coworking_desk");
                 }}
               >
-                + Workspace
+                + Co-working desk
               </Button>
               <Button
                 onClick={() => {
                   addWorkspace("lounge_desk");
                 }}
               >
-                + Lonuge
+                + Lounge desk
               </Button>
               <Button
                 onClick={() => {
@@ -192,6 +196,22 @@ export const SpaceShow = () => {
               backgroundSize: "100% auto",
               position: "relative",
             }}
+            onMouseMove={(ev: any) => {
+              // console.log(workspace.id);
+              if (dragId) {
+                const el = document.getElementById(`workspace-${dragId}`);
+                const offsets = document
+                  .getElementById("space")
+                  ?.getBoundingClientRect();
+                const top = offsets?.top || 0;
+                const left = offsets?.left || 0;
+                if (el) {
+                  el.style.left = ev.clientX - left + "px";
+                  el.style.top = ev.clientY - top + "px";
+                  console.log(el.style.left, el.style.top);
+                }
+              }
+            }}
           >
             {workspaces.map((workspace) => {
               const colors: any = {
@@ -204,7 +224,9 @@ export const SpaceShow = () => {
                 <div
                   key={workspace.id}
                   onClick={() => {
-                    show(workspace.documentId);
+                    if (!dragId) {
+                      show(workspace.documentId);
+                    }
                   }}
                   id={`workspace-${workspace.id}`}
                   style={{
@@ -214,45 +236,27 @@ export const SpaceShow = () => {
                     width: workspace.width * 100 * zoom + "px",
                     height: workspace.height * 100 * zoom + "px",
                     background: colors[workspace.type] ?? "black",
-                    opacity: 0.6,
+                    // opacity: 0.6,
                   }}
-                  draggable
-                  onDrag={(ev: any) => {
-                    const el = document.getElementById(
-                      `workspace-${workspace.id}`
-                    );
-                    const offsets = document
-                      .getElementById("space")
-                      ?.getBoundingClientRect();
-                    const top = offsets?.top || 0;
-                    const left = offsets?.left || 0;
-                    if (el) {
-                      el.style.left = ev.clientX - left + "px";
-                      el.style.top = ev.clientY - top + "px";
-                      console.log(el.style.left, el.style.top);
-                    }
+                  // draggable
+                  onMouseDown={() => {
+                    setDragId(workspace.id + "");
                   }}
-                  onDragEnd={(e) => {
-                    const el = document.getElementById(
-                      `workspace-${workspace.id}`
-                    );
-                    const offsets = document
-                      .getElementById("space")
-                      ?.getBoundingClientRect();
-                    const top = offsets?.top || 0;
-                    const left = offsets?.left || 0;
-                    const x = e.clientX - left;
-                    const y = e.clientY - top;
+                  onMouseUp={() => {
+                    const el = document.getElementById(`workspace-${dragId}`);
                     if (el) {
+                      const top = parseFloat(el.style.top.replace("px", ""));
+                      const left = parseFloat(el.style.left.replace("px", ""));
                       mutateUpdate({
                         resource: "work-spaces",
                         id: workspace.documentId,
                         values: {
-                          position_x: x / 100 / zoom,
-                          position_y: y / 100 / zoom,
+                          position_x: left / 100 / zoom,
+                          position_y: top / 100 / zoom,
                         },
                       });
                     }
+                    setDragId("");
                   }}
                 ></div>
               );
@@ -438,7 +442,6 @@ export const SpaceShow = () => {
             <Select>
               <Select.Option value="coworking_desk">Bàn chung</Select.Option>
               <Select.Option value="lounge_desk">Bàn riêng</Select.Option>
-
               <Select.Option value="meeting_room">Phòng họp</Select.Option>
               <Select.Option value="conference_room">
                 Phòng hội nghị

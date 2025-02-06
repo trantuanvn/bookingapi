@@ -398,10 +398,10 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                       .filter((a) => a.space?.id == s.id)
                       .map((workspace: any) => {
                         const colors: any = {
-                          seat: "#f50",
+                          coworking_desk: "#ff5560",
                           meeting_room: "#2db7f5",
                           conference_room: "#87d068",
-                          lounge: "#108ee9",
+                          lounge_desk: "#108ee9",
                         };
                         return (
                           <Popover
@@ -429,7 +429,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                               }}
                             >
                               <div>
-                                <p style={{ margin: 0 }}>
+                                {/* <p style={{ margin: 0 }}>
                                   Type: <b>{workspace.type}</b>
                                 </p>
                                 <p style={{ margin: 0 }}>
@@ -439,7 +439,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                                   />{" "}
                                   VND
                                 </p>
-                                <p style={{ margin: 0 }}>Bookings</p>
+                                <p style={{ margin: 0 }}>Bookings</p> */}
                               </div>
                             </div>
                           </Popover>
