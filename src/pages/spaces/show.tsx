@@ -223,8 +223,8 @@ export const SpaceShow = () => {
               return (
                 <div
                   key={workspace.id}
-                  onClick={() => {
-                    if (!dragId) {
+                  onClick={(e) => {
+                    if (e.ctrlKey || e.metaKey) {
                       show(workspace.documentId);
                     }
                   }}

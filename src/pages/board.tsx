@@ -25,7 +25,7 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../constants";
 import dayjs from "dayjs";
 import _ from "lodash";
-import { PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
 import ButtonGroup from "antd/es/button/button-group";
 
@@ -334,7 +334,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                     {bookingItems
                       .filter(
                         (b) =>
-                          b.work_space.id == a.id &&
+                          b.work_space?.id == a.id &&
                           b.date == date &&
                           b.start_time <= time &&
                           b.end_time >= time
@@ -799,7 +799,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                       {fields.map((field, index) => {
                         return (
                           <Row gutter={12} key={field.key}>
-                            <Col span={12}>
+                            <Col span={14}>
                               <Form.Item
                                 {...field}
                                 key={field.key}
@@ -832,18 +832,20 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                               <Form.Item
                                 {...field}
                                 key={field.key}
-                                label="Quantity"
+                                label="Số lượng"
                                 name={[field.name, "quantity"]}
                                 initialValue={1}
                               >
                                 <InputNumber value={1} disabled />
                               </Form.Item>
                             </Col>
-                            <Col span={4}>
+                            <Col span={2}>
                               <div style={{ height: "28px" }} />
-                              <Button block onClick={() => remove(index)}>
-                                Remove
-                              </Button>
+                              <Button
+                                block
+                                onClick={() => remove(index)}
+                                icon={<DeleteOutlined />}
+                              />
                             </Col>
                           </Row>
                         );
