@@ -76,7 +76,16 @@ export default function UploadFile({
         {children ? (
           children
         ) : (
-          <p style={{ minWidth: 60 }} className="ant-upload-text">
+          <p
+            style={{
+              minWidth: 60,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 2,
+            }}
+            className="ant-upload-text"
+          >
             + Ảnh
           </p>
         )}

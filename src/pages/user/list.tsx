@@ -1,4 +1,6 @@
 import {
+  Create,
+  CreateButton,
   DateField,
   DeleteButton,
   EditButton,
@@ -8,21 +10,59 @@ import {
   useTable,
 } from "@refinedev/antd";
 import { type BaseRecord, useMany } from "@refinedev/core";
-import { Avatar, Space, Table } from "antd";
+import { Avatar, Input, Space, Table } from "antd";
 import { API_URL } from "../../constants";
 
 export const UserList = () => {
-  const { tableProps } = useTable({
+  const { tableProps, filters, setFilters } = useTable({
     syncWithLocation: true,
     meta: {
-      populate: ["role", "avatar"],
+      populate: ["role", "avatar", "currentPlan"],
+    },
+    sorters: {
+      initial: [
+        {
+          field: "createdAt",
+          order: "desc",
+        },
+      ],
     },
   });
 
   return (
-    <List>
+    <List
+      headerButtons={
+        <Space>
+          <Input.Search
+            placeholder="Tìm kiếm"
+            style={{ width: 300 }}
+            onSearch={(value) => {
+              setFilters([
+                {
+                  operator: "or",
+                  value: [
+                    {
+                      field: "username",
+                      operator: "contains",
+                      value: value,
+                    },
+                    {
+                      field: "phoneNumber",
+                      operator: "contains",
+                      value: value,
+                    },
+                  ],
+                },
+              ]);
+            }}
+          />
+          <CreateButton
+            children={<span style={{ fontSize: 14 }}>Tạo người dùng mới</span>}
+          />
+        </Space>
+      }
+    >
       <Table {...tableProps} rowKey="id">
-        {/* <Table.Column dataIndex="id" title={"ID"} /> */}
         <Table.Column
           dataIndex={["avatar"]}
           title="Avatar"
@@ -33,6 +73,11 @@ export const UserList = () => {
         <Table.Column dataIndex="phoneNumber" title={"SĐT"} />
         <Table.Column dataIndex="fullName" title={"Tên đầy đủ"} />
         <Table.Column dataIndex={["role", "name"]} title={"Phân quyền"} />
+        <Table.Column
+          dataIndex={["currentPlan", "name"]}
+          title={"Gói dịch vụ hiện tại"}
+          render={(value: any) => <MarkdownField value={value} />}
+        />
 
         <Table.Column
           dataIndex={["createdAt"]}

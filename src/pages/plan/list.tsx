@@ -50,7 +50,7 @@ export const PlanList = () => {
           title={"Loại bàn / phòng cung cấp"}
           render={(r, i) => (
             <div>
-              {r.split(",").map((a: string) => (
+              {r?.split(",").map((a: string) => (
                 <Tag key={a}>
                   {a == "coworking_desk" ? "Bàn chung" : ""}
                   {a == "lounge_desk" ? "Bàn riêng" : ""}
