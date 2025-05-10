@@ -582,6 +582,9 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
         value: "1",
       },
     ],
+    pagination: {
+      pageSize: 10000,
+    },
   });
 
   const userList = data?.data || [];
@@ -724,10 +727,10 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 rules={[{ required: true }]}
               >
                 <Select>
-                  <Select.Option value="morning">Morning</Select.Option>
-                  <Select.Option value="afternoon">Afternoon</Select.Option>
-                  <Select.Option value="allday">All day</Select.Option>
-                  <Select.Option value="custom">Custom</Select.Option>
+                  <Select.Option value="morning">Sáng</Select.Option>
+                  <Select.Option value="afternoon">Chiều</Select.Option>
+                  <Select.Option value="allday">Cả ngày</Select.Option>
+                  <Select.Option value="custom">Linh hoạt</Select.Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -737,7 +740,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 label="Start time"
                 rules={[{ required: true }]}
               >
-                <Select>
+                <Select disabled={timeMode !== "custom"}>
                   {times.map((t) => (
                     <Select.Option key={t} value={t}>
                       {t}
@@ -752,7 +755,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 label="End time"
                 rules={[{ required: true }]}
               >
-                <Select>
+                <Select disabled={timeMode !== "custom"}>
                   {times.map((t) => (
                     <Select.Option key={t} value={t}>
                       {t}
