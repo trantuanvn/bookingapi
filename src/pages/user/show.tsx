@@ -1,7 +1,29 @@
-import { DateField, MarkdownField, Show, useTable } from "@refinedev/antd";
+import { DeleteOutlined } from "@ant-design/icons";
+import {
+  DateField,
+  DeleteButton,
+  MarkdownField,
+  Show,
+  useModalForm,
+  useSelect,
+  useTable,
+} from "@refinedev/antd";
 import { useList, useOne, useShow } from "@refinedev/core";
-import { Card, Form, Input, Table, Typography } from "antd";
+import {
+  Button,
+  Card,
+  DatePicker,
+  Divider,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Table,
+  Typography,
+} from "antd";
 import dayjs from "dayjs";
+import { useEffect } from "react";
 
 const { Title } = Typography;
 
@@ -44,9 +66,46 @@ export const UserShow = () => {
       ],
     },
   });
+  const modalFormNew = useModalForm({
+    action: "create",
+    resource: "subscriptions",
+    redirect: false,
+  });
+
+  const time = Form.useWatch("time", modalFormNew?.formProps?.form);
+  const startDate = Form.useWatch("startDate", modalFormNew?.formProps?.form);
+
+  useEffect(() => {
+    if (time && startDate && modalFormNew?.formProps?.form) {
+      const end = dayjs(startDate).add(time, "month");
+      modalFormNew.formProps.form.setFieldValue("endDate", end);
+    }
+  }, [time, startDate, modalFormNew?.formProps?.form]);
+
+  const modalFormExpand = useModalForm({
+    action: "edit",
+    resource: "subscriptions",
+    redirect: false,
+  });
+
+  const modalFormUpgrade = useModalForm({
+    action: "edit",
+    resource: "subscriptions",
+    redirect: false,
+  });
+
+  const { selectProps: selectPropsPlan } = useSelect({
+    resource: "plans",
+    optionLabel: "name",
+  });
 
   return (
-    <Show breadcrumb={null} isLoading={isLoading} headerButtons={[]}>
+    <Show
+      breadcrumb={null}
+      isLoading={isLoading}
+      headerButtons={[]}
+      title={<Title level={5}>Thông tin người dùng: {record?.username}</Title>}
+    >
       {record && (
         <Card title="Thông tin">
           <Form
@@ -72,7 +131,19 @@ export const UserShow = () => {
         </Card>
       )}
       <br />
-      <Card title="Subscription">
+      <Card
+        title="Gói dịch vụ hiện tại"
+        extra={
+          <Button
+            type="primary"
+            onClick={() => {
+              modalFormNew.show();
+            }}
+          >
+            Thêm gói dịch vụ
+          </Button>
+        }
+      >
         <Table {...tablePropsSubsciption}>
           <Table.Column
             title="Gói dịch vụ"
@@ -121,6 +192,47 @@ export const UserShow = () => {
               </span>
             )}
           />
+          <Table.Column
+            title="Ngày tạo"
+            dataIndex="createdAt"
+            render={(value) => (
+              <DateField value={value} format="DD/MM/YYYY hh:mm" />
+            )}
+          />
+          <Table.Column
+            title="Hành động"
+            dataIndex="actions"
+            render={(_, record) => {
+              return (
+                <Space>
+                  <DeleteButton
+                    resource="subscription"
+                    hideText
+                    size="small"
+                  />
+
+                  <Button
+                    size="small"
+                    type="primary"
+                    onClick={() => {
+                      modalFormExpand.show();
+                    }}
+                  >
+                    Gia hạn
+                  </Button>
+                  <Button
+                    size="small"
+                    type="primary"
+                    onClick={() => {
+                      modalFormUpgrade.show();
+                    }}
+                  >
+                    Nâng cấp
+                  </Button>
+                </Space>
+              );
+            }}
+          />
         </Table>
       </Card>
       <br />
@@ -138,6 +250,191 @@ export const UserShow = () => {
           />
         </Table>
       </Card>
+
+      <Modal {...modalFormExpand.modalProps} width={600}>
+        <Form {...modalFormExpand.formProps} layout="vertical">
+          <Form.Item label={"Thời gian"} name={["duration"]}>
+            <Select
+              options={[
+                {
+                  label: "1 tháng",
+                  value: 1,
+                },
+                {
+                  label: "3 tháng",
+                  value: 3,
+                },
+                {
+                  label: "6 tháng",
+                  value: 6,
+                },
+                {
+                  label: "1 năm",
+                  value: 12,
+                },
+                {
+                  label: "2 năm",
+                  value: 24,
+                },
+                {
+                  label: "3 năm",
+                  value: 36,
+                },
+              ]}
+              style={{ width: "100%" }}
+              placeholder="Thời gian"
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal {...modalFormUpgrade.modalProps} width={600}>
+        <Form {...modalFormUpgrade.formProps} layout="vertical">
+          <Form.Item label={"Gói dịch vụ"} name={["plan"]}>
+            <Select
+              options={[
+                {
+                  label: "Basic",
+                  value: "basic",
+                },
+                {
+                  label: "Pro",
+                  value: "pro",
+                },
+                {
+                  label: "Enterprise",
+                  value: "enterprise",
+                },
+              ]}
+              style={{ width: "100%" }}
+              placeholder="Gói dịch vụ"
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal {...modalFormNew.modalProps} width={600}>
+        <Form {...modalFormNew.formProps} layout="vertical">
+          <Form.Item
+            name={["plan"]}
+            label={"Gói dịch vụ"}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select {...selectPropsPlan} style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item
+            label={"Ngày bắt đầu"}
+            name={["startDate"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <DatePicker />
+          </Form.Item>
+          <Form.Item
+            label={"Thời gian"}
+            name={["time"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+              options={[
+                {
+                  label: "1 tháng",
+                  value: 1,
+                },
+                {
+                  label: "3 tháng",
+                  value: 3,
+                },
+                {
+                  label: "6 tháng",
+                  value: 6,
+                },
+                {
+                  label: "1 năm",
+                  value: 12,
+                },
+                {
+                  label: "2 năm",
+                  value: 24,
+                },
+                {
+                  label: "3 năm",
+                  value: 36,
+                },
+              ]}
+              style={{ width: "100%" }}
+              placeholder="Thời gian"
+            />
+          </Form.Item>
+          <Form.Item label={"Ngày kết thúc"} name={["endDate"]}>
+            <DatePicker disabled />
+          </Form.Item>
+          <Divider />
+          <h3>Thanh toán</h3>
+
+          <Form.Item
+            label={"Hình thức thanh toán"}
+            name={["paymentMethod"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+              options={[
+                {
+                  label: "Chuyển khoản",
+                  value: "bankTransfer",
+                },
+                {
+                  label: "Tiền mặt",
+                  value: "cash",
+                },
+                {
+                  label: "Thẻ tín dụng",
+                  value: "creditCard",
+                },
+              ]}
+              style={{ width: "100%" }}
+              placeholder="Hình thức thanh toán"
+            />
+          </Form.Item>
+          <Form.Item
+            label={"Số tiền"}
+            name={["amount"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item
+            label={"Ghi chú"}
+            name={["note"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+        </Form>
+      </Modal>
     </Show>
   );
 };
