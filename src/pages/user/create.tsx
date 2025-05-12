@@ -1,5 +1,15 @@
 import { Create, useForm, useSelect } from "@refinedev/antd";
-import { Button, DatePicker, Divider, Form, Input, Select } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Divider,
+  Form,
+  Input,
+  Row,
+  Select,
+} from "antd";
 import UploadFile from "../../components/image";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
@@ -20,6 +30,7 @@ export const UserCreate = () => {
   const { selectProps: selectPropsPlan } = useSelect({
     resource: "plans",
     optionLabel: "name",
+    optionValue: "documentId",
   });
 
   const startDate = Form.useWatch("startDate", formProps.form);
@@ -41,7 +52,6 @@ export const UserCreate = () => {
       title={isEdit ? "Chỉnh sửa người dùng" : "Tạo người dùng mới"}
     >
       <Form
-        style={{ width: "500px", margin: "auto" }}
         {...formProps}
         layout="vertical"
         initialValues={{
@@ -57,190 +67,179 @@ export const UserCreate = () => {
           }
         }}
       >
-        <Form.Item
-          label={"Tên đăng nhập"}
-          name={["username"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input disabled={isEdit} />
-        </Form.Item>
-        <Form.Item label={"Tên đầy đủ"} name={["fullName"]}>
-          <Input />
-        </Form.Item>
-        <Form.Item label={"Số điện thoại"} name={["phoneNumber"]}>
-          <Input />
-        </Form.Item>
-        <Form.Item label={"Avatar"} name={["avatar"]}>
-          <UploadFile>
-            <Button>Chọn ảnh</Button>
-          </UploadFile>
-        </Form.Item>
-        {!id && (
-          <>
-            <Form.Item
-              label={"Email"}
-              name={["email"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Input type="email" />
-            </Form.Item>
-            <Form.Item
-              label={"Mật khẩu"}
-              name={["password"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Input.Password />
-            </Form.Item>
-          </>
-        )}
-        <Form.Item
-          label={"Chức danh"}
-          name={["role"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select {...selectProps} />
-        </Form.Item>
-        {!isEdit && (
-          <>
-            <Divider />
-            <h3>Gói dịch vụ</h3>
-
-            <Form.Item
-              name={["plan"]}
-              label={"Gói dịch vụ"}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Select {...selectPropsPlan} style={{ width: "100%" }} />
-            </Form.Item>
-            <Form.Item
-              label={"Ngày bắt đầu"}
-              name={["startDate"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <DatePicker />
-            </Form.Item>
-            <Form.Item
-              label={"Thời gian"}
-              name={["time"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Select
-                options={[
+        <Row gutter={16}>
+          <Col span={8}>
+            <Card title="Thông tin người dùng">
+              <Form.Item
+                label={"Tên đăng nhập"}
+                name={["username"]}
+                rules={[
                   {
-                    label: "1 tháng",
-                    value: 1,
-                  },
-                  {
-                    label: "3 tháng",
-                    value: 3,
-                  },
-                  {
-                    label: "6 tháng",
-                    value: 6,
-                  },
-                  {
-                    label: "1 năm",
-                    value: 12,
-                  },
-                  {
-                    label: "2 năm",
-                    value: 24,
-                  },
-                  {
-                    label: "3 năm",
-                    value: 36,
+                    required: true,
                   },
                 ]}
-                style={{ width: "100%" }}
-                placeholder="Thời gian"
-              />
-            </Form.Item>
-            <Form.Item label={"Ngày kết thúc"} name={["endDate"]}>
-              <DatePicker disabled />
-            </Form.Item>
-            <Divider />
-            <h3>Thanh toán</h3>
-
-            <Form.Item
-              label={"Hình thức thanh toán"}
-              name={["paymentMethod"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Select
-                options={[
+              >
+                <Input disabled={isEdit} />
+              </Form.Item>
+              <Form.Item label={"Tên đầy đủ"} name={["fullName"]}>
+                <Input />
+              </Form.Item>
+              <Form.Item label={"Số điện thoại"} name={["phoneNumber"]}>
+                <Input />
+              </Form.Item>
+              <Form.Item label={"Avatar"} name={["avatar"]}>
+                <UploadFile>
+                  <Button>Chọn ảnh</Button>
+                </UploadFile>
+              </Form.Item>
+              {!id && (
+                <>
+                  <Form.Item
+                    label={"Email"}
+                    name={["email"]}
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                  >
+                    <Input type="email" />
+                  </Form.Item>
+                  <Form.Item
+                    label={"Mật khẩu"}
+                    name={["password"]}
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                  >
+                    <Input.Password />
+                  </Form.Item>
+                </>
+              )}
+              <Form.Item
+                label={"Chức danh"}
+                name={["role"]}
+                rules={[
                   {
-                    label: "Chuyển khoản",
-                    value: "bankTransfer",
-                  },
-                  {
-                    label: "Tiền mặt",
-                    value: "cash",
-                  },
-                  {
-                    label: "Thẻ tín dụng",
-                    value: "creditCard",
+                    required: true,
                   },
                 ]}
-                style={{ width: "100%" }}
-                placeholder="Hình thức thanh toán"
-              />
-            </Form.Item>
-            <Form.Item
-              label={"Số tiền"}
-              name={["amount"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Input type="number" />
-            </Form.Item>
-            <Form.Item
-              label={"Ghi chú"}
-              name={["note"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Input.TextArea />
-            </Form.Item>
-          </>
-        )}
+              >
+                <Select {...selectProps} />
+              </Form.Item>
+            </Card>
+          </Col>
+          {!isEdit && (
+            <Col span={16}>
+              <Card title="Gói dịch vụ">
+                <Form.Item
+                  name={["plan"]}
+                  label={"Gói dịch vụ"}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Select {...selectPropsPlan} style={{ width: "100%" }} />
+                </Form.Item>
+                <Form.Item
+                  label={"Ngày bắt đầu"}
+                  name={["startDate"]}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <DatePicker />
+                </Form.Item>
+                <Form.Item
+                  label={"Thời gian"}
+                  name={["time"]}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Select
+                    options={[
+                      {
+                        label: "1 tháng",
+                        value: 1,
+                      },
+                      {
+                        label: "3 tháng",
+                        value: 3,
+                      },
+                      {
+                        label: "6 tháng",
+                        value: 6,
+                      },
+                      {
+                        label: "1 năm",
+                        value: 12,
+                      },
+                      {
+                        label: "2 năm",
+                        value: 24,
+                      },
+                      {
+                        label: "3 năm",
+                        value: 36,
+                      },
+                    ]}
+                    style={{ width: "100%" }}
+                    placeholder="Thời gian"
+                  />
+                </Form.Item>
+                <Form.Item label={"Ngày kết thúc"} name={["endDate"]}>
+                  <DatePicker disabled />
+                </Form.Item>
+              </Card>
+
+              <br />
+
+              <Card title="Thông tin thanh toán">
+                <Form.Item
+                  label={"Hình thức thanh toán"}
+                  name={["paymentMethod"]}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                  initialValue={"bankTransfer"}
+                >
+                  <Select
+                    options={[
+                      {
+                        label: "Chuyển khoản",
+                        value: "bankTransfer",
+                      },
+                      {
+                        label: "Tiền mặt",
+                        value: "cash",
+                      },
+                      {
+                        label: "Thẻ tín dụng",
+                        value: "creditCard",
+                      },
+                    ]}
+                    style={{ width: "100%" }}
+                    placeholder="Hình thức thanh toán"
+                  />
+                </Form.Item>
+                <Form.Item label={"Ghi chú"} name={["note"]}>
+                  <Input.TextArea />
+                </Form.Item>
+              </Card>
+            </Col>
+          )}
+        </Row>
       </Form>
     </Create>
   );

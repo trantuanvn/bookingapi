@@ -115,6 +115,18 @@ export const UserShow = () => {
     optionLabel: "name",
   });
 
+  const modalFormPaymentNew = useModalForm({
+    action: "create",
+    resource: "payments",
+    redirect: false,
+  });
+
+  const modalFormPaymentEdit = useModalForm({
+    action: "create",
+    resource: "payments",
+    redirect: false,
+  });
+
   return (
     <Show
       breadcrumb={null}
@@ -253,7 +265,19 @@ export const UserShow = () => {
         </Table>
       </Card>
       <br />
-      <Card title="Payment">
+      <Card
+        title="Lịch sử thanh toán"
+        extra={
+          <Button
+            type="primary"
+            onClick={() => {
+              modalFormPaymentNew.show();
+            }}
+          >
+            Thêm thanh toán
+          </Button>
+        }
+      >
         <Table {...tablePropsPayment}>
           <Table.Column title="" dataIndex="code" />
           <Table.Column
@@ -291,7 +315,8 @@ export const UserShow = () => {
                     size="small"
                     type="primary"
                     onClick={() => {
-                      modalFormExpand.show(record.documentId);
+                      // modalFormExpand.show(record.documentId);
+                      modalFormPaymentEdit.show(record.documentId);
                     }}
                   >
                     Chỉnh sửa
@@ -309,8 +334,8 @@ export const UserShow = () => {
           layout="vertical"
           initialValues={{
             ...valuesExpand,
-            start: dayjs(valuesExpand?.start),
-            end: dayjs(valuesExpand?.end),
+            start: valuesExpand?.start ? dayjs(valuesExpand?.start) : null,
+            end: valuesExpand?.end ? dayjs(valuesExpand?.end) : null,
             time: dayjs(valuesExpand?.end).diff(
               dayjs(valuesExpand?.start),
               "month"
@@ -606,6 +631,186 @@ export const UserShow = () => {
           >
             <Input type="number" />
           </Form.Item>
+          <Form.Item
+            label={"Ghi chú"}
+            name={["note"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Thêm thanh toán"
+        {...modalFormPaymentNew.modalProps}
+        width={600}
+      >
+        <Form
+          {...modalFormPaymentNew.formProps}
+          layout="vertical"
+          initialValues={{
+            ...modalFormPaymentNew.formProps?.initialValues,
+            payment_date: dayjs(
+              modalFormPaymentNew.formProps?.initialValues?.payment_date
+            ),
+          }}
+        >
+          <Form.Item
+            name={["user"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input disabled />
+          </Form.Item>
+          <Form.Item
+            label={"Ngày thanh toán"}
+            name={["payment_date"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <DatePicker />
+          </Form.Item>
+          <Form.Item
+            label={"Hình thức thanh toán"}
+            name={["payment_method"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+              options={[
+                {
+                  label: "Chuyển khoản",
+                  value: "bankTransfer",
+                },
+                {
+                  label: "Tiền mặt",
+                  value: "cash",
+                },
+                {
+                  label: "Thẻ tín dụng",
+                  value: "creditCard",
+                },
+              ]}
+              style={{ width: "100%" }}
+              placeholder="Hình thức thanh toán"
+            />
+          </Form.Item>
+          <Form.Item
+            label={"Số tiền"}
+            name={["amount"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item
+            label={"Ghi chú"}
+            name={["note"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Chỉnh sửa thanh toán"
+        {...modalFormPaymentEdit.modalProps}
+        width={600}
+      >
+        <Form
+          {...modalFormPaymentEdit.formProps}
+          layout="vertical"
+          initialValues={{
+            ...modalFormPaymentEdit.formProps?.initialValues,
+            payment_date: dayjs(
+              modalFormPaymentEdit.formProps?.initialValues?.payment_date
+            ),
+            user: record?.id,
+          }}
+        >
+          <Form.Item
+            name={["user"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input disabled />
+          </Form.Item>
+          <Form.Item
+            label={"Ngày thanh toán"}
+            name={["payment_date"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <DatePicker />
+          </Form.Item>
+          <Form.Item
+            label={"Hình thức thanh toán"}
+            name={["payment_method"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+              options={[
+                {
+                  label: "Chuyển khoản",
+                  value: "bankTransfer",
+                },
+                {
+                  label: "Tiền mặt",
+                  value: "cash",
+                },
+                {
+                  label: "Thẻ tín dụng",
+                  value: "creditCard",
+                },
+              ]}
+              style={{ width: "100%" }}
+              placeholder="Hình thức thanh toán"
+            />
+          </Form.Item>
+          <Form.Item
+            label={"Số tiền"}
+            name={["amount"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input type="number" />
+          </Form.Item>
+
           <Form.Item
             label={"Ghi chú"}
             name={["note"]}
