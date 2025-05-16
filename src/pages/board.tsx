@@ -573,7 +573,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
   const { data } = useList({
     resource: "users",
     meta: {
-      populate: "*",
+      populate: ["role", "avatar", "currentPlan"],
     },
     filters: [
       {
@@ -660,7 +660,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
         Tạo đặt chỗ
       </Button>
 
-      <Modal {...modalProps}>
+      <Modal {...modalProps} title="Tạo đặt chỗ">
         <Form
           {...formProps}
           initialValues={{
@@ -668,7 +668,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
             start_time: "08:00",
             end_time: "12:00",
             booking_items: [{}],
-            type: "single",
+            type: "subscription",
             time_mode: "morning",
           }}
           layout="vertical"
@@ -704,9 +704,15 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
             return formProps.onFinish?.(dataSend);
           }}
         >
+          <Divider />
           <Row gutter={[12, 0]}>
             <Col span={4}>
-              <Form.Item name="type" label="Type" rules={[{ required: true }]}>
+              <Form.Item
+                name="type"
+                label="Type"
+                rules={[{ required: true }]}
+                initialValue="subscription"
+              >
                 <Select>
                   <Select.Option value="single">Lẻ</Select.Option>
                   <Select.Option value="subscription">Thành viên</Select.Option>
@@ -744,11 +750,13 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 rules={[{ required: true }]}
               >
                 <Select disabled={timeMode !== "custom"}>
-                  {times.map((t) => (
-                    <Select.Option key={t} value={t}>
-                      {t}
-                    </Select.Option>
-                  ))}
+                  {times
+                    .filter((t) => t < endTime)
+                    .map((t) => (
+                      <Select.Option key={t} value={t}>
+                        {t}
+                      </Select.Option>
+                    ))}
                 </Select>
               </Form.Item>
             </Col>
@@ -759,11 +767,13 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 rules={[{ required: true }]}
               >
                 <Select disabled={timeMode !== "custom"}>
-                  {times.map((t) => (
-                    <Select.Option key={t} value={t}>
-                      {t}
-                    </Select.Option>
-                  ))}
+                  {times
+                    .filter((t) => t > startTime)
+                    .map((t) => (
+                      <Select.Option key={t} value={t}>
+                        {t}
+                      </Select.Option>
+                    ))}
                 </Select>
               </Form.Item>
             </Col>
@@ -774,11 +784,13 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 rules={[{ required: type == "subscription" }]}
               >
                 <Select>
-                  {userList.map((u) => (
-                    <Select.Option key={u.id} value={u.id}>
-                      {u.username}
-                    </Select.Option>
-                  ))}
+                  {userList
+                    .filter((u) => u.currentPlan)
+                    .map((u) => (
+                      <Select.Option key={u.id} value={u.id}>
+                        {u.username}
+                      </Select.Option>
+                    ))}
                 </Select>
               </Form.Item>
             </Col>
@@ -807,7 +819,6 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
             </Col>
             <Col span={24}>
               <Card title="Chi tiết chỗ ngồi" size="small">
-                {bookingItemSelect.join(",")}
                 <Form.List name="booking_items">
                   {(fields, { add, remove }) => (
                     <>
@@ -815,7 +826,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                         const bookingItem = bookingItems[index];
                         return (
                           <Row gutter={12} key={field.key}>
-                            <Col span={type == "single" ? 14 : 18}>
+                            <Col span={type == "single" ? 18 : 22}>
                               <Form.Item
                                 {...field}
                                 key={field.key}
@@ -823,7 +834,17 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                                 rules={[{ required: true }]}
                                 name={[field.name, "work_space"]}
                               >
-                                <Select>
+                                <Select
+                                  onChange={(value) => {
+                                    const workSpace = workSpaces.find(
+                                      (w) => w.id == value
+                                    );
+                                    formProps.form?.setFieldsValue({
+                                      [`booking_items.${field.name}.price`]:
+                                        workSpace?.price_half_day,
+                                    });
+                                  }}
+                                >
                                   {workSpaces
                                     .filter((w) => {
                                       return (
@@ -834,36 +855,33 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                                     .map((w) => (
                                       <Select.Option key={w.id} value={w.id}>
                                         {w.type} - {w.name} | {w.space?.name} (
-                                        {w.price_per_hour} USD)
+                                        {w.price_half_day} USD)
                                       </Select.Option>
                                     ))}
                                 </Select>
                               </Form.Item>
                             </Col>
-                            {type == "single" && (
-                              <Col span={4}>
-                                <Form.Item
-                                  {...field}
-                                  key={field.key}
-                                  rules={[{ required: true }]}
-                                  label="Giá"
-                                  name={[field.name, "price"]}
-                                >
-                                  <InputNumber suffix="USD" />
-                                </Form.Item>
-                              </Col>
-                            )}
-                            <Col span={4}>
+                            <Col span={4} hidden={type != "single"}>
                               <Form.Item
                                 {...field}
                                 key={field.key}
-                                label="Số lượng"
-                                name={[field.name, "quantity"]}
-                                initialValue={1}
+                                // rules={[{ required: true }]}
+                                label="Giá"
+                                name={[field.name, "price"]}
                               >
-                                <InputNumber value={1} disabled />
+                                <InputNumber suffix="USD" disabled />
                               </Form.Item>
                             </Col>
+                            <Form.Item
+                              {...field}
+                              key={field.key}
+                              hidden
+                              label="Số lượng"
+                              name={[field.name, "quantity"]}
+                              initialValue={1}
+                            >
+                              <InputNumber value={1} disabled />
+                            </Form.Item>
                             <Col span={2}>
                               <div style={{ height: "28px" }} />
                               <Button
@@ -875,7 +893,16 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                           </Row>
                         );
                       })}
-                      <Button onClick={() => add()}>Add</Button>
+                      <Button
+                        onClick={() => {
+                          add({
+                            work_space: "",
+                            price: 0,
+                          });
+                        }}
+                      >
+                        Thêm
+                      </Button>
                     </>
                   )}
                 </Form.List>
@@ -886,8 +913,8 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               <>
                 <Col span={10}>
                   <Card title="Summary" size="small">
-                    <p>Tổng thời gian: {offet} min</p>
-                    <p>Thanh toán: {total}USD VND</p>
+                    <p>Tổng thời gian: {offet || 0} min</p>
+                    <p>Thanh toán: {total || 0}USD VND</p>
                     <p>Số bàn: {bookingItems?.length}</p>
                     <Divider />
 
