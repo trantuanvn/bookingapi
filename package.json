@@ -5,6 +5,8 @@
   "type": "module",
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
+    "@ckeditor/ckeditor5-build-decoupled-document": "^44.3.0",
+    "@ckeditor/ckeditor5-react": "^9.5.0",
     "@refinedev/antd": "^5.44.0",
     "@refinedev/cli": "^2.16.21",
     "@refinedev/core": "^4.47.1",

@@ -23,11 +23,21 @@ import {
   Typography,
 } from "antd";
 import dayjs from "dayjs";
+import _ from "lodash";
 import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+
+import weekday from "dayjs/plugin/weekday";
+import localeData from "dayjs/plugin/localeData";
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+dayjs.locale("en");
+dayjs.locale("vi");
 
 const { Title } = Typography;
 
 export const UserShow = () => {
+  const { id } = useParams();
   const { query } = useShow({
     meta: {
       populate: ["avatar", "role", "currentPlan"],
@@ -51,6 +61,12 @@ export const UserShow = () => {
         },
       ],
     },
+    initialSorter: [
+      {
+        field: "createdAt",
+        order: "desc",
+      },
+    ],
   });
 
   const { tableProps: tablePropsPayment } = useTable({
@@ -113,6 +129,7 @@ export const UserShow = () => {
   const { selectProps: selectPropsPlan } = useSelect({
     resource: "plans",
     optionLabel: "name",
+    optionValue: "documentId",
   });
 
   const modalFormPaymentNew = useModalForm({
@@ -166,13 +183,29 @@ export const UserShow = () => {
             type="primary"
             onClick={() => {
               modalFormNew.show();
+              const last = _.last(
+                _.sortBy(tablePropsSubsciption?.dataSource, "end", "asc")
+              );
+              console.log("last", last);
+              if (modalFormNew.formProps.form && last) {
+                modalFormNew.formProps.form.setFieldValue("user", id);
+                modalFormNew.formProps.form.setFieldValue(
+                  "start",
+                  dayjs(last.end || new Date())
+                );
+              }
             }}
           >
             Thêm gói dịch vụ
           </Button>
         }
       >
-        <Table {...tablePropsSubsciption}>
+        <Table
+          {...tablePropsSubsciption}
+          pagination={{
+            hideOnSinglePage: true,
+          }}
+        >
           <Table.Column
             title="Gói dịch vụ"
             dataIndex={["plan", "name"]}
@@ -181,9 +214,7 @@ export const UserShow = () => {
           <Table.Column
             title="Ngày bắt đầu"
             dataIndex="start"
-            render={(value) => (
-              <DateField value={value} format="DD/MM/YYYY hh:mm" />
-            )}
+            render={(value) => <DateField value={value} format="DD/MM/YYYY" />}
           />
           <Table.Column
             title="Ngày hết hạn"
@@ -207,7 +238,7 @@ export const UserShow = () => {
               );
             }}
           />
-          <Table.Column
+          {/* <Table.Column
             title="Trạng thái"
             dataIndex="state"
             render={(value) => (
@@ -219,7 +250,7 @@ export const UserShow = () => {
                 )}
               </span>
             )}
-          />
+          /> */}
           <Table.Column
             title="Ngày tạo"
             dataIndex="createdAt"
@@ -272,20 +303,52 @@ export const UserShow = () => {
             type="primary"
             onClick={() => {
               modalFormPaymentNew.show();
+              modalFormPaymentNew?.formProps?.form?.setFieldValue("user", id);
             }}
           >
             Thêm thanh toán
           </Button>
         }
       >
-        <Table {...tablePropsPayment}>
-          <Table.Column title="" dataIndex="code" />
+        <Table
+          {...tablePropsPayment}
+          pagination={{
+            hideOnSinglePage: true,
+          }}
+        >
+          {/* <Table.Column title="" dataIndex="code" /> */}
           <Table.Column
             title="Phương thức thanh toán"
             dataIndex="payment_method"
+            render={(value) => {
+              if (value === "bankTransfer") {
+                return "Chuyển khoản";
+              }
+              if (value === "cash") {
+                return "Tiền mặt";
+              }
+              if (value === "creditCard") {
+                return "Thẻ tín dụng";
+              }
+              return value;
+            }}
           />
           <Table.Column title="Số tiền" dataIndex="amount" />
-          <Table.Column title="Trạng thái" dataIndex="state" />
+          <Table.Column
+            title="Trạng thái"
+            dataIndex="state"
+            render={(value) => {
+              if (value == "completed") {
+                return <span style={{ color: "green" }}>Đã thanh toán</span>;
+              }
+              if (value == "pending") {
+                return <span style={{ color: "orange" }}>Chờ thanh toán</span>;
+              }
+              if (value == "failed") {
+                return <span style={{ color: "red" }}>Thất bại</span>;
+              }
+            }}
+          />
           <Table.Column
             title="Ngày thanh toán"
             dataIndex="payment_date"
@@ -315,7 +378,6 @@ export const UserShow = () => {
                     size="small"
                     type="primary"
                     onClick={() => {
-                      // modalFormExpand.show(record.documentId);
                       modalFormPaymentEdit.show(record.documentId);
                     }}
                   >
@@ -419,26 +481,7 @@ export const UserShow = () => {
               placeholder="Hình thức thanh toán"
             />
           </Form.Item>
-          <Form.Item
-            label={"Số tiền"}
-            name={["amount"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item
-            label={"Ghi chú"}
-            name={["note"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
+          <Form.Item label={"Ghi chú"} name={["note"]}>
             <Input.TextArea />
           </Form.Item>
         </Form>
@@ -450,7 +493,7 @@ export const UserShow = () => {
           layout="vertical"
           initialValues={{
             ...valuesUpgrade,
-            plan: valuesUpgrade?.plan?.id,
+            plan: valuesUpgrade?.plan?.documentId,
             start: dayjs(valuesUpgrade?.start),
             end: dayjs(valuesUpgrade?.end),
             time: dayjs(valuesUpgrade?.end).diff(
@@ -508,22 +551,37 @@ export const UserShow = () => {
           >
             <Input type="number" />
           </Form.Item>
-          <Form.Item
-            label={"Ghi chú"}
-            name={["note"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
+          <Form.Item label={"Ghi chú"} name={["note"]}>
             <Input.TextArea />
           </Form.Item>
         </Form>
       </Modal>
 
       <Modal {...modalFormNew.modalProps} width={600}>
-        <Form {...modalFormNew.formProps} layout="vertical">
+        <Form
+          {...modalFormNew.formProps}
+          layout="vertical"
+          initialValues={{
+            ...modalFormNew.formProps?.initialValues,
+            // start: dayjs(modalFormNew.formProps?.initialValues?.start),
+            // end: dayjs(modalFormNew.formProps?.initialValues?.end),
+            start: null,
+            end: null,
+            // time: 1,
+          }}
+        >
+          <Form.Item
+            label={"Người dùng"}
+            name={["user"]}
+            initialValue={id}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input disabled />
+          </Form.Item>
           <Form.Item
             name={["plan"]}
             label={"Gói dịch vụ"}
@@ -554,6 +612,7 @@ export const UserShow = () => {
                 required: true,
               },
             ]}
+            initialValue={1}
           >
             <Select
               options={[
@@ -589,59 +648,45 @@ export const UserShow = () => {
           <Form.Item label={"Ngày kết thúc"} name={["end"]}>
             <DatePicker disabled />
           </Form.Item>
-          <Divider />
-          <h3>Thanh toán</h3>
-
-          <Form.Item
-            label={"Hình thức thanh toán"}
-            name={["paymentMethod"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Select
-              options={[
+          <Card title="Thanh toán">
+            <Form.Item
+              label={"Hình thức thanh toán"}
+              name={["paymentMethod"]}
+              initialValue={null}
+              rules={[
                 {
-                  label: "Chuyển khoản",
-                  value: "bankTransfer",
-                },
-                {
-                  label: "Tiền mặt",
-                  value: "cash",
-                },
-                {
-                  label: "Thẻ tín dụng",
-                  value: "creditCard",
+                  required: true,
                 },
               ]}
-              style={{ width: "100%" }}
-              placeholder="Hình thức thanh toán"
-            />
-          </Form.Item>
-          <Form.Item
-            label={"Số tiền"}
-            name={["amount"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item
-            label={"Ghi chú"}
-            name={["note"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input.TextArea />
-          </Form.Item>
+            >
+              <Select
+                options={[
+                  // {
+                  //   label: "Không có",
+                  //   value: null,
+                  // },
+                  {
+                    label: "Chuyển khoản",
+                    value: "bankTransfer",
+                  },
+                  {
+                    label: "Tiền mặt",
+                    value: "cash",
+                  },
+                  {
+                    label: "Thẻ tín dụng",
+                    value: "creditCard",
+                  },
+                ]}
+                style={{ width: "100%" }}
+                placeholder="Hình thức thanh toán"
+              />
+            </Form.Item>
+
+            <Form.Item label={"Ghi chú"} name={["note"]}>
+              <Input.TextArea />
+            </Form.Item>
+          </Card>
         </Form>
       </Modal>
 
@@ -720,15 +765,7 @@ export const UserShow = () => {
           >
             <Input type="number" />
           </Form.Item>
-          <Form.Item
-            label={"Ghi chú"}
-            name={["note"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
+          <Form.Item label={"Ghi chú"} name={["note"]}>
             <Input.TextArea />
           </Form.Item>
         </Form>
@@ -811,15 +848,7 @@ export const UserShow = () => {
             <Input type="number" />
           </Form.Item>
 
-          <Form.Item
-            label={"Ghi chú"}
-            name={["note"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
+          <Form.Item label={"Ghi chú"} name={["note"]}>
             <Input.TextArea />
           </Form.Item>
         </Form>

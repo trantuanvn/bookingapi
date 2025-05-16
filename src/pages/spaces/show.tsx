@@ -37,6 +37,7 @@ import { useEffect, useState } from "react";
 import { SaveOutlined, UploadOutlined } from "@ant-design/icons";
 import ButtonGroup from "antd/es/button/button-group";
 import _ from "lodash";
+import MDEditor from "@uiw/react-md-editor";
 
 const { Title } = Typography;
 
@@ -412,16 +413,13 @@ export const SpaceShow = () => {
                 </Form.Item>
               </Col>
               <Col span={24}>
-                <Form.Item
-                  label={"Mô tả"}
-                  name={["description"]}
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
+                <Form.Item label={"Mô tả"} name={["description"]}>
                   <Input.TextArea />
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <Form.Item label={"Mô tả"} name={["content"]}>
+                  <MDEditor />
                 </Form.Item>
               </Col>
             </Row>
