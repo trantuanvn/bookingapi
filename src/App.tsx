@@ -54,8 +54,8 @@ function App() {
   const notificationProvider: NotificationProvider = {
     open: (e) => {
       notification.open({
-        message: e.message,
-        description: e.message,
+        message: 'Có lỗi xảy ra',
+        description: e.description,
         placement: "top",
         // duration: 3,
         type: e.type as any,
