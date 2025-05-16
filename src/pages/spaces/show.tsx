@@ -148,42 +148,72 @@ export const SpaceShow = () => {
             >
               <Button icon={<UploadOutlined />}>Hình nền</Button>
             </UploadFile>
-            <ButtonGroup>
-              <Button
-                onClick={() => {
-                  addWorkspace("coworking_desk");
-                }}
+            <Form
+              layout="inline"
+              initialValues={data}
+              onFinish={(values) => {
+                mutateUpdate({
+                  resource: "spaces",
+                  id: id,
+                  values,
+                });
+              }}
+            >
+              <Form.Item
+                label={"Chiều ngang"}
+                name={["width"]}
               >
-                + Co-working desk
-              </Button>
+                <InputNumber style={{ width: 100 }} suffix="m" />
+              </Form.Item>
+              <Form.Item
+                label={"Chiều dọc"}
+                name={["height"]}
+                >
+                <InputNumber style={{ width: 100 }} suffix="m" />
+              </Form.Item>
               <Button
-                onClick={() => {
-                  addWorkspace("lounge_desk");
-                }}
-              >
-                + Lounge desk
-              </Button>
-              <Button
-                onClick={() => {
-                  addWorkspace("meeting_room");
-                }}
-              >
-                + Metting room
-              </Button>
-              <Button
-                onClick={() => {
-                  addWorkspace("conference_room");
-                }}
-              >
-                + Conference room
-              </Button>
-            </ButtonGroup>
+                type="primary"
+                htmlType="submit"
+                icon={<SaveOutlined />}
+              ></Button>
+            </Form>
           </Space>
         }
       >
+        <ButtonGroup>
+          <Button
+            onClick={() => {
+              addWorkspace("coworking_desk");
+            }}
+          >
+            + Co-working desk
+          </Button>
+          <Button
+            onClick={() => {
+              addWorkspace("lounge_desk");
+            }}
+          >
+            + Lounge desk
+          </Button>
+          <Button
+            onClick={() => {
+              addWorkspace("meeting_room");
+            }}
+          >
+            + Metting room
+          </Button>
+          <Button
+            onClick={() => {
+              addWorkspace("conference_room");
+            }}
+          >
+            + Conference room
+          </Button>
+        </ButtonGroup>
         <div
           id="space"
           style={{
+            marginTop: 20,
             overflow: "auto",
           }}
         >
@@ -344,92 +374,6 @@ export const SpaceShow = () => {
         </Table>
       </Card>
       <br />
-      {data?.id && (
-        <Card title={"Thông tin khu vực"}>
-          <Form
-            layout="vertical"
-            initialValues={data}
-            onFinish={(values) => {
-              mutateUpdate({
-                resource: "spaces",
-                id: id,
-                values,
-              });
-            }}
-          >
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  label={"Tên khu vực"}
-                  name={["name"]}
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-
-              <Col span={12}>
-                <Form.Item
-                  label={"Mã khu vực"}
-                  name={["code"]}
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-
-              <Col span={12}>
-                <Form.Item
-                  label={"Chiều ngang (m)"}
-                  name={["width"]}
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <InputNumber />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  label={"Chiều dọc (m)"}
-                  name={["height"]}
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <InputNumber />
-                </Form.Item>
-              </Col>
-              <Col span={24}>
-                <Form.Item label={"Mô tả"} name={["description"]}>
-                  <Input.TextArea />
-                </Form.Item>
-              </Col>
-              <Col span={24}>
-                <Form.Item label={"Mô tả"} name={["content"]}>
-                  <MDEditor />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
-              Lưu thay đổi
-            </Button>
-          </Form>
-        </Card>
-      )}
 
       <Modal {...modalProps} width={400}>
         <Form {...formPropsEditWSP} layout="vertical">

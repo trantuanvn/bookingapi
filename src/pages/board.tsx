@@ -641,6 +641,11 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
   );
   const total = _.sumBy(bookingItems, "price") * (offet / 60);
 
+  const type = Form.useWatch("type", formProps.form);
+  const bookingItemSelect = bookingItems
+    .map((b: any) => b?.work_space)
+    .filter((a: any) => a);
+
   const [isPayment, setIsPayment] = useState(false);
 
   return (
@@ -652,7 +657,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
         }}
         icon={<PlusOutlined />}
       >
-        Create Booking
+        Tạo đặt chỗ
       </Button>
 
       <Modal {...modalProps}>
@@ -678,8 +683,8 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               start_time: values.start_time,
               end_time: values.end_time,
               date: date,
-              price: b.price,
-              total: b.price * (offsetTime / 60),
+              price: b.price || 0,
+              total: (b.price || 0) * (offsetTime / 60),
               quantity: b.quantity || 1,
             }));
             const dataSend = {
@@ -703,17 +708,15 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
             <Col span={4}>
               <Form.Item name="type" label="Type" rules={[{ required: true }]}>
                 <Select>
-                  <Select.Option value="single">Single</Select.Option>
-                  <Select.Option value="subscription">
-                    Subscription
-                  </Select.Option>
+                  <Select.Option value="single">Lẻ</Select.Option>
+                  <Select.Option value="subscription">Thành viên</Select.Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item
                 name="date"
-                label="Date"
+                label="Ngày"
                 getValueProps={(i) => ({ value: dayjs(i) })}
                 rules={[{ required: true }]}
               >
@@ -723,7 +726,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
             <Col span={4}>
               <Form.Item
                 name="time_mode"
-                label="Time mode"
+                label="Khung giờ"
                 rules={[{ required: true }]}
               >
                 <Select>
@@ -737,7 +740,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
             <Col span={4}>
               <Form.Item
                 name="start_time"
-                label="Start time"
+                label="Bắt đầu"
                 rules={[{ required: true }]}
               >
                 <Select disabled={timeMode !== "custom"}>
@@ -752,7 +755,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
             <Col span={4}>
               <Form.Item
                 name="end_time"
-                label="End time"
+                label="Giờ kết thúc"
                 rules={[{ required: true }]}
               >
                 <Select disabled={timeMode !== "custom"}>
@@ -765,7 +768,11 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               </Form.Item>
             </Col>
             <Col span={9}>
-              <Form.Item name="user" label="User">
+              <Form.Item
+                name="user"
+                label="Khách hàng"
+                rules={[{ required: type == "subscription" }]}
+              >
                 <Select>
                   {userList.map((u) => (
                     <Select.Option key={u.id} value={u.id}>
@@ -776,14 +783,18 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               </Form.Item>
             </Col>
             <Col span={5}>
-              <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+              <Form.Item
+                name="name"
+                label="Tên khách"
+                rules={[{ required: true }]}
+              >
                 <Input />
               </Form.Item>
             </Col>
             <Col span={5}>
               <Form.Item
                 name="phone"
-                label="Phone"
+                label="Số điện thoại"
                 rules={[{ required: true }]}
               >
                 <Input />
@@ -795,42 +806,53 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Card title="Booking Items" size="small">
+              <Card title="Chi tiết chỗ ngồi" size="small">
+                {bookingItemSelect.join(",")}
                 <Form.List name="booking_items">
                   {(fields, { add, remove }) => (
                     <>
                       {fields.map((field, index) => {
+                        const bookingItem = bookingItems[index];
                         return (
                           <Row gutter={12} key={field.key}>
-                            <Col span={14}>
+                            <Col span={type == "single" ? 14 : 18}>
                               <Form.Item
                                 {...field}
                                 key={field.key}
-                                label="Work Space"
+                                label="Chỗ ngồi / Phòng"
                                 rules={[{ required: true }]}
                                 name={[field.name, "work_space"]}
                               >
                                 <Select>
-                                  {workSpaces.map((w) => (
-                                    <Select.Option key={w.id} value={w.id}>
-                                      {w.type} - {w.name} | {w.space?.name} (
-                                      {w.price_per_hour} USD)
-                                    </Select.Option>
-                                  ))}
+                                  {workSpaces
+                                    .filter((w) => {
+                                      return (
+                                        bookingItem?.work_space == w.id ||
+                                        !bookingItemSelect.includes(w.id)
+                                      );
+                                    })
+                                    .map((w) => (
+                                      <Select.Option key={w.id} value={w.id}>
+                                        {w.type} - {w.name} | {w.space?.name} (
+                                        {w.price_per_hour} USD)
+                                      </Select.Option>
+                                    ))}
                                 </Select>
                               </Form.Item>
                             </Col>
-                            <Col span={4}>
-                              <Form.Item
-                                {...field}
-                                key={field.key}
-                                rules={[{ required: true }]}
-                                label="Giá"
-                                name={[field.name, "price"]}
-                              >
-                                <InputNumber suffix="USD" />
-                              </Form.Item>
-                            </Col>
+                            {type == "single" && (
+                              <Col span={4}>
+                                <Form.Item
+                                  {...field}
+                                  key={field.key}
+                                  rules={[{ required: true }]}
+                                  label="Giá"
+                                  name={[field.name, "price"]}
+                                >
+                                  <InputNumber suffix="USD" />
+                                </Form.Item>
+                              </Col>
+                            )}
                             <Col span={4}>
                               <Form.Item
                                 {...field}
@@ -860,62 +882,65 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               </Card>
               <br />
             </Col>
-            <Col span={10}>
-              <Card title="Summary" size="small">
-                <p>Total time: {offet} min</p>
-                <p>
-                  Total payment: {total}USD ={" "}
-                  <NumberField value={total * 25000} />
-                  VND
-                </p>
-                <p>Total seat/room: {bookingItems?.length}</p>
-                <Divider />
+            {type == "single" && (
+              <>
+                <Col span={10}>
+                  <Card title="Summary" size="small">
+                    <p>Tổng thời gian: {offet} min</p>
+                    <p>Thanh toán: {total}USD VND</p>
+                    <p>Số bàn: {bookingItems?.length}</p>
+                    <Divider />
 
-                <Form.Item name="description" label="Note">
-                  <Input.TextArea />
-                </Form.Item>
-              </Card>
-            </Col>
-            <Col span={14}>
-              <Card
-                title={
-                  <Space>
-                    <Switch
-                      size="small"
-                      checked={isPayment}
-                      onChange={() => setIsPayment(!isPayment)}
-                      title="Payment"
-                    />
-                    Payment
-                  </Space>
-                }
-                size="small"
-              >
-                {isPayment && (
-                  <>
-                    <Form.Item name={["payment", "ref_code"]} label="Ref code">
-                      <Input />
-                    </Form.Item>
-                    <Form.Item
-                      name={["payment", "payment_method"]}
-                      label="Payment Method"
-                      rules={[{ required: true }]}
-                    >
-                      <Select>
-                        <Select.Option value="cash">Tiền mặt</Select.Option>
-                        <Select.Option value="debit">Nợ</Select.Option>
-                        <Select.Option value="banking">
-                          Chuyển khoản
-                        </Select.Option>
-                      </Select>
-                    </Form.Item>
-                    <Form.Item name={["payment", "note"]} label="Note">
+                    <Form.Item name="description" label="Note">
                       <Input.TextArea />
                     </Form.Item>
-                  </>
-                )}
-              </Card>
-            </Col>
+                  </Card>
+                </Col>
+                <Col span={14}>
+                  <Card
+                    title={
+                      <Space>
+                        <Switch
+                          size="small"
+                          checked={isPayment}
+                          onChange={() => setIsPayment(!isPayment)}
+                          title="Payment"
+                        />
+                        Thanh toán
+                      </Space>
+                    }
+                    size="small"
+                  >
+                    {isPayment && (
+                      <>
+                        <Form.Item
+                          name={["payment", "ref_code"]}
+                          label="Ref code"
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                          name={["payment", "payment_method"]}
+                          label="Payment Method"
+                          rules={[{ required: true }]}
+                        >
+                          <Select>
+                            <Select.Option value="cash">Tiền mặt</Select.Option>
+                            <Select.Option value="debit">Nợ</Select.Option>
+                            <Select.Option value="banking">
+                              Chuyển khoản
+                            </Select.Option>
+                          </Select>
+                        </Form.Item>
+                        <Form.Item name={["payment", "note"]} label="Ghi chú">
+                          <Input.TextArea />
+                        </Form.Item>
+                      </>
+                    )}
+                  </Card>
+                </Col>
+              </>
+            )}
           </Row>
         </Form>
       </Modal>
