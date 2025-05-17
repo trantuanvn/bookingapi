@@ -172,6 +172,9 @@ export const UserShow = () => {
             <Form.Item name="phoneNumber" label="Số điện thoại">
               <Input placeholder="Nhập số điện thoại" />
             </Form.Item>
+            <Form.Item name={["currentPlan", "name"]} label="Gói dịch vụ">
+              <Input placeholder="Nhập địa chỉ" />
+            </Form.Item>
           </Form>
         </Card>
       )}

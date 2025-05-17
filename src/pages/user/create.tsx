@@ -1,4 +1,4 @@
-import { Create, useForm, useSelect } from "@refinedev/antd";
+import { Create, useForm, useModalForm, useSelect } from "@refinedev/antd";
 import {
   Button,
   Card,
@@ -7,6 +7,7 @@ import {
   Divider,
   Form,
   Input,
+  Modal,
   Row,
   Select,
 } from "antd";
@@ -44,11 +45,13 @@ export const UserCreate = () => {
     }
   }, [startDate, time, formProps?.form]);
 
+
   const isEdit = !!id;
   return (
     <Create
       saveButtonProps={{ ...saveButtonProps, children: "Lưu lại" }}
       breadcrumb={null}
+      
       title={isEdit ? "Chỉnh sửa người dùng" : "Tạo người dùng mới"}
     >
       <Form
@@ -62,6 +65,7 @@ export const UserCreate = () => {
         }}
         onFinish={(d: any) => {
           d.avatar = d.avatar?.id;
+          d.provider = "local";
           if (formProps.onFinish) {
             formProps.onFinish(d);
           }
@@ -241,6 +245,7 @@ export const UserCreate = () => {
           )}
         </Row>
       </Form>
+
     </Create>
   );
 };

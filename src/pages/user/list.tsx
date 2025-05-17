@@ -7,10 +7,11 @@ import {
   List,
   MarkdownField,
   ShowButton,
+  useModalForm,
   useTable,
 } from "@refinedev/antd";
 import { type BaseRecord, useMany } from "@refinedev/core";
-import { Avatar, Input, Space, Table } from "antd";
+import { Avatar, Button, Form, Input, Modal, Space, Table } from "antd";
 import { API_URL } from "../../constants";
 
 export const UserList = () => {
@@ -26,6 +27,13 @@ export const UserList = () => {
           order: "desc",
         },
       ],
+    },
+  });
+  const formModalPassword = useModalForm({
+    resource: "users",
+    action: "create",
+    meta: {
+      type: "reset-password",
     },
   });
 
@@ -92,10 +100,83 @@ export const UserList = () => {
             <Space>
               <EditButton hideText size="small" recordItemId={record.id} />
               <ShowButton hideText size="small" recordItemId={record.id} />
+              <Button
+                key="cancel"
+                onClick={() => {
+                  formModalPassword.show();
+                  formModalPassword.formProps.form?.setFieldValue(
+                    "email",
+                    record.email
+                  );
+                }}
+              >
+                Cập nhật mật khẩu
+              </Button>
             </Space>
           )}
         />
       </Table>
+
+      <Modal
+        {...formModalPassword.modalProps}
+        width={600}
+        title="Cập nhật mật khẩu"
+      >
+        <Form
+          {...formModalPassword.formProps}
+          layout="vertical"
+          initialValues={{
+            ...formModalPassword.formProps.initialValues,
+            password: "",
+            confirmPassword: "",
+          }}
+        >
+          <Form.Item
+            name={["email"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input disabled />
+          </Form.Item>
+          <Form.Item
+            label={"Mật khẩu"}
+            name={["password"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            label={"Nhập lại mật khẩu"}
+            name={["confirmPassword"]}
+            dependencies={["password"]}
+            rules={[
+              {
+                required: true,
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("Mật khẩu không khớp, vui lòng nhập lại!")
+                  );
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+        </Form>
+      </Modal>
     </List>
   );
 };

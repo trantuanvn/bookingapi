@@ -94,13 +94,17 @@ export const DataProvider = (
     };
   },
 
-  create: async ({ resource, variables }) => {
-    const url = `${apiUrl}/${resource}`;
+  create: async ({ resource, variables, meta }) => {
+    let url = `${apiUrl}/${resource}`;
 
     let dataVariables: any = { data: variables };
 
     if (resource === "users") {
       dataVariables = variables;
+    }
+
+    if (meta?.type) {
+      url = `${apiUrl}/${resource}/${meta?.type}`;
     }
 
     try {
