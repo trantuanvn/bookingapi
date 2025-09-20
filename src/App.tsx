@@ -195,9 +195,11 @@ function App() {
                               {...props}
                               fixed
                               Title={() => (
-                                <Typography.Title level={3}>
-                                  LaSpace
-                                </Typography.Title>
+                                <img
+                                  src="/logo-white.svg"
+                                  alt="LaSpace"
+                                  style={{ width: 120, margin: "16px" }}
+                                />
                               )}
                             />
                           )}

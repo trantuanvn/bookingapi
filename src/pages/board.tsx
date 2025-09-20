@@ -1,5 +1,5 @@
-import { NumberField, Show, useModalForm, useSelect } from "@refinedev/antd";
-import { useList } from "@refinedev/core";
+import { NumberField, Show, useModalForm, useSelect } from "@refinedev/antd"
+import { useList } from "@refinedev/core"
 import {
   Button,
   Calendar,
@@ -20,19 +20,19 @@ import {
   Table,
   Tag,
   Typography,
-} from "antd";
-import { useEffect, useState } from "react";
-import { API_URL } from "../constants";
-import dayjs from "dayjs";
-import _ from "lodash";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import Search from "antd/lib/input/Search";
-import ButtonGroup from "antd/es/button/button-group";
+} from "antd"
+import { useEffect, useState } from "react"
+import { API_URL } from "../constants"
+import dayjs from "dayjs"
+import _ from "lodash"
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons"
+import Search from "antd/lib/input/Search"
+import ButtonGroup from "antd/es/button/button-group"
 
-const { Title } = Typography;
+const { Title } = Typography
 
 export const Board = () => {
-  const [month, setMonth] = useState(dayjs().format("YYYY-MM-01"));
+  const [month, setMonth] = useState(dayjs().format("YYYY-MM-01"))
   const { data, refetch } = useList({
     resource: "bookings",
     meta: {
@@ -59,24 +59,24 @@ export const Board = () => {
         order: "asc",
       },
     ],
-  });
-  const bookings = data?.data || [];
+  })
+  const bookings = data?.data || []
 
-  const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"))
 
-  const bookingItems: any[] = [];
+  const bookingItems: any[] = []
   bookings.forEach((b) => {
     b.booking_items.forEach((bi: any) => {
       bookingItems.push({
         booking: b,
         ...bi,
-      });
-    });
-  });
+      })
+    })
+  })
 
   const renderDate = (date: any) => {
-    let bookingList = bookingItems.filter((b: any) => b.date === date);
-    bookingList = _.uniqBy(bookingList, "booking.code");
+    let bookingList = bookingItems.filter((b: any) => b.date === date)
+    bookingList = _.uniqBy(bookingList, "booking.code")
     return (
       <div>
         {bookingList.map((b) => (
@@ -92,8 +92,8 @@ export const Board = () => {
           />
         ))}
       </div>
-    );
-  };
+    )
+  }
   return (
     <Show
       title="Board"
@@ -104,7 +104,7 @@ export const Board = () => {
         />,
         <CreateBooking
           onDone={() => {
-            refetch();
+            refetch()
           }}
         />,
       ]}
@@ -116,8 +116,8 @@ export const Board = () => {
               cellRender={(r) => renderDate(r.format("YYYY-MM-DD"))}
               mode="month"
               onChange={(date) => {
-                setDate(date.format("YYYY-MM-DD"));
-                setMonth(date.format("YYYY-MM-01"));
+                setDate(date.format("YYYY-MM-DD"))
+                setMonth(date.format("YYYY-MM-01"))
               }}
             />
           </Card>
@@ -156,15 +156,15 @@ export const Board = () => {
                         </span>
                       ))}
                     </Space>
-                  );
+                  )
                 }}
               />
               <Table.Column dataIndex="total" title="Total" />
               <Table.Column
                 render={(_, r) => {
                   if (r.state == "approved")
-                    return <Tag color="green">Paid</Tag>;
-                  return <PaymentButton booking={r} />;
+                    return <Tag color="green">Paid</Tag>
+                  return <PaymentButton booking={r} />
                 }}
               />
             </Table>
@@ -172,8 +172,8 @@ export const Board = () => {
         </Col>
       </Row>
     </Show>
-  );
-};
+  )
+}
 const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
   const { data: dataSpaces } = useList({
     resource: "spaces",
@@ -183,7 +183,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
     pagination: {
       pageSize: 100,
     },
-  });
+  })
 
   const { data: dataWorksSpaces } = useList({
     resource: "work-spaces",
@@ -193,25 +193,25 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
     pagination: {
       pageSize: 100,
     },
-  });
+  })
 
-  const [mode, setMode] = useState(localStorage.getItem("modeView") || "space");
-
-  useEffect(() => {
-    localStorage.setItem("modeView", mode);
-  }, [mode]);
-
-  const spaces = dataSpaces?.data || [];
-  const workSpaces = dataWorksSpaces?.data || [];
-  const [zoom, setZoom] = useState(Number(localStorage.getItem("zoom") || 1));
+  const [mode, setMode] = useState(localStorage.getItem("modeView") || "space")
 
   useEffect(() => {
-    localStorage.setItem("zoom", zoom.toString());
-  }, [zoom]);
+    localStorage.setItem("modeView", mode)
+  }, [mode])
+
+  const spaces = dataSpaces?.data || []
+  const workSpaces = dataWorksSpaces?.data || []
+  const [zoom, setZoom] = useState(Number(localStorage.getItem("zoom") || 1))
+
+  useEffect(() => {
+    localStorage.setItem("zoom", zoom.toString())
+  }, [zoom])
 
   const [wordspaceId, setWorkSpaceId] = useState(
     spaces.length > 0 ? spaces[0].id : ""
-  );
+  )
 
   // const allSpaces = spaces.map((s: any) => {
   //   return {
@@ -235,7 +235,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                 >
                   {s.name}
                 </Button>
-              );
+              )
             })}
           </ButtonGroup>
 
@@ -250,7 +250,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
             value={Math.round(zoom * 100)}
             suffix="%"
             onChange={(value) => {
-              setZoom((value || 0) / 100);
+              setZoom((value || 0) / 100)
             }}
           />
           <Button size="small" onClick={() => setZoom(zoom + 0.01)}>
@@ -288,7 +288,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
               Time
             </div>
             {[...Array(10).keys()].map((i) => {
-              const time = `${("00" + (i + 8)).slice(-2)}:00`;
+              const time = `${("00" + (i + 8)).slice(-2)}:00`
               return (
                 <div
                   style={{
@@ -298,7 +298,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                 >
                   {time}
                 </div>
-              );
+              )
             })}
           </div>
           {workSpaces.map((a) => (
@@ -321,7 +321,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                 {a.name}
               </div>
               {[...Array(10).keys()].map((i) => {
-                const time = `${("00" + (i + 8)).slice(-2)}:00`;
+                const time = `${("00" + (i + 8)).slice(-2)}:00`
                 return (
                   <div
                     style={{
@@ -352,7 +352,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                         </div>
                       ))}
                   </div>
-                );
+                )
               })}
             </div>
           ))}
@@ -362,7 +362,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
         spaces
           .filter((a) => a.id == wordspaceId)
           .map((s: any) => {
-            const bg = API_URL + s.background?.url || "";
+            const bg = API_URL + s.background?.url || ""
             return (
               <div key={s.id}>
                 <Title level={5}>{s.name}</Title>
@@ -402,7 +402,7 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                           meeting_room: "#2db7f5",
                           conference_room: "#87d068",
                           lounge_desk: "#108ee9",
-                        };
+                        }
                         return (
                           <Popover
                             key={workspace.id}
@@ -443,24 +443,24 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                               </div>
                             </div>
                           </Popover>
-                        );
+                        )
                       })}
                   </div>
                 </div>
               </div>
-            );
+            )
           })}
     </Card>
-  );
-};
+  )
+}
 
 const BookingCode = ({ booking }: { booking: any }) => {
-  let tag = <Tag color="blue">{booking.code}</Tag>;
+  let tag = <Tag color="blue">{booking.code}</Tag>
   if (booking.state == "pending") {
-    tag = <Tag color="red">{booking.code}</Tag>;
+    tag = <Tag color="red">{booking.code}</Tag>
   }
   if (booking.state == "approved") {
-    tag = <Tag color="green">{booking.code}</Tag>;
+    tag = <Tag color="green">{booking.code}</Tag>
   }
 
   return (
@@ -494,21 +494,21 @@ const BookingCode = ({ booking }: { booking: any }) => {
     >
       {tag}
     </Popover>
-  );
-};
+  )
+}
 
 const PaymentButton = ({ booking }: { booking: any }) => {
   const { modalProps, formProps, show, close } = useModalForm({
     resource: "payments",
     action: "create",
-  });
+  })
   return (
     <>
       <Button
         type="primary"
         size="small"
         onClick={() => {
-          show();
+          show()
         }}
       >
         Payment
@@ -522,7 +522,7 @@ const PaymentButton = ({ booking }: { booking: any }) => {
               ...values,
               booking: booking.documentId,
               user: booking.user.id,
-            });
+            })
           }}
           initialValues={{
             amount: booking.total - booking.totalPayment,
@@ -549,8 +549,8 @@ const PaymentButton = ({ booking }: { booking: any }) => {
         </Form>
       </Modal>
     </>
-  );
-};
+  )
+}
 
 const CreateBooking = ({ onDone }: { onDone: any }) => {
   const { modalProps, formProps, show, close } = useModalForm({
@@ -558,9 +558,9 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
     resource: "bookings",
     redirect: false,
     onMutationSuccess: () => {
-      onDone();
+      onDone()
     },
-  });
+  })
   const { data: dataWorkSpace } = useList({
     resource: "work-spaces",
     meta: {
@@ -569,7 +569,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
     pagination: {
       pageSize: 100,
     },
-  });
+  })
   const { data } = useList({
     resource: "users",
     meta: {
@@ -585,75 +585,75 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
     pagination: {
       pageSize: 10000,
     },
-  });
+  })
 
-  const userList = data?.data || [];
-  const workSpaces = dataWorkSpace?.data || [];
+  const userList = data?.data || []
+  const workSpaces = dataWorkSpace?.data || []
 
-  const userId = Form.useWatch("user", formProps.form);
+  const userId = Form.useWatch("user", formProps.form)
   useEffect(() => {
-    const user = userList.find((u) => u.id === userId);
+    const user = userList.find((u) => u.id === userId)
     if (user) {
       formProps.form?.setFieldsValue({
         name: user.full_name || user.username,
         phone: user.phoneNumber,
         email: user.email,
-      });
+      })
     }
-  }, [userId, userList]);
+  }, [userId, userList])
 
-  const times = [];
+  const times = []
   for (let i = 8; i < 22; i++) {
-    times.push(("00" + i).slice(-2) + ":00");
-    times.push(("00" + i).slice(-2) + ":30");
+    times.push(("00" + i).slice(-2) + ":00")
+    times.push(("00" + i).slice(-2) + ":30")
   }
 
-  const timeMode = Form.useWatch("time_mode", formProps.form);
+  const timeMode = Form.useWatch("time_mode", formProps.form)
   useEffect(() => {
     if (timeMode === "morning") {
       formProps.form?.setFieldsValue({
         start_time: "08:00",
         end_time: "12:00",
-      });
+      })
     }
     if (timeMode === "afternoon") {
       formProps.form?.setFieldsValue({
         start_time: "13:00",
         end_time: "17:00",
-      });
+      })
     }
 
     if (timeMode === "allday") {
       formProps.form?.setFieldsValue({
         start_time: "08:00",
         end_time: "17:00",
-      });
+      })
     }
-  }, [timeMode]);
+  }, [timeMode])
 
-  const bookingItems = Form.useWatch("booking_items", formProps.form) || [];
-  const date = Form.useWatch("date", formProps.form);
-  const startTime = Form.useWatch("start_time", formProps.form);
-  const endTime = Form.useWatch("end_time", formProps.form);
+  const bookingItems = Form.useWatch("booking_items", formProps.form) || []
+  const date = Form.useWatch("date", formProps.form)
+  const startTime = Form.useWatch("start_time", formProps.form)
+  const endTime = Form.useWatch("end_time", formProps.form)
   const offet = dayjs(date + " " + endTime).diff(
     date + " " + startTime,
     "minute"
-  );
-  const total = _.sumBy(bookingItems, "price") * (offet / 60);
+  )
+  const total = _.sumBy(bookingItems, "price") * (offet / 60)
 
-  const type = Form.useWatch("type", formProps.form);
+  const type = Form.useWatch("type", formProps.form)
   const bookingItemSelect = bookingItems
     .map((b: any) => b?.work_space)
-    .filter((a: any) => a);
+    .filter((a: any) => a)
 
-  const [isPayment, setIsPayment] = useState(false);
+  const [isPayment, setIsPayment] = useState(false)
 
   return (
     <>
       <Button
         type="primary"
         onClick={() => {
-          show();
+          show()
         }}
         icon={<PlusOutlined />}
       >
@@ -673,11 +673,11 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
           }}
           layout="vertical"
           onFinish={(values: any) => {
-            const date = dayjs(values.date).format("YYYY-MM-DD");
+            const date = dayjs(values.date).format("YYYY-MM-DD")
             const offsetTime = dayjs(date + " " + values.end_time).diff(
               date + " " + values.start_time,
               "minute"
-            );
+            )
             const booking_items = values.booking_items.map((b: any) => ({
               work_space: b.work_space,
               start_time: values.start_time,
@@ -686,12 +686,12 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
               price: b.price || 0,
               total: (b.price || 0) * (offsetTime / 60),
               quantity: b.quantity || 1,
-            }));
+            }))
             const dataSend = {
               ...values,
               booking_items: booking_items,
               total: _.sumBy(booking_items, "total"),
-            };
+            }
             if (isPayment) {
               dataSend.payment = {
                 note: values.payment?.note,
@@ -699,9 +699,9 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                 payment_method: values.payment?.payment_method,
                 state: "DONE",
                 payment_date: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-              };
+              }
             }
-            return formProps.onFinish?.(dataSend);
+            return formProps.onFinish?.(dataSend)
           }}
         >
           <Divider />
@@ -823,7 +823,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                   {(fields, { add, remove }) => (
                     <>
                       {fields.map((field, index) => {
-                        const bookingItem = bookingItems[index];
+                        const bookingItem = bookingItems[index]
                         return (
                           <Row gutter={12} key={field.key}>
                             <Col span={type == "single" ? 18 : 22}>
@@ -838,11 +838,11 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                                   onChange={(value) => {
                                     const workSpace = workSpaces.find(
                                       (w) => w.id == value
-                                    );
+                                    )
                                     formProps.form?.setFieldsValue({
                                       [`booking_items.${field.name}.price`]:
                                         workSpace?.price_half_day,
-                                    });
+                                    })
                                   }}
                                 >
                                   {workSpaces
@@ -850,7 +850,7 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                                       return (
                                         bookingItem?.work_space == w.id ||
                                         !bookingItemSelect.includes(w.id)
-                                      );
+                                      )
                                     })
                                     .map((w) => (
                                       <Select.Option key={w.id} value={w.id}>
@@ -891,14 +891,14 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
                               />
                             </Col>
                           </Row>
-                        );
+                        )
                       })}
                       <Button
                         onClick={() => {
                           add({
                             work_space: "",
                             price: 0,
-                          });
+                          })
                         }}
                       >
                         Thêm
@@ -972,5 +972,5 @@ const CreateBooking = ({ onDone }: { onDone: any }) => {
         </Form>
       </Modal>
     </>
-  );
-};
+  )
+}
