@@ -1,9 +1,33 @@
-import type { AuthProvider } from "@refinedev/core";
+import type { AuthProvider, HttpError } from "@refinedev/core";
 import { AuthHelper } from "@refinedev/strapi-v4";
 import axios from "axios";
 import { API_URL, TOKEN_KEY } from "./constants";
 
 export const axiosInstance = axios.create();
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    const customError: HttpError = {
+      ...error,
+      message: error.response?.data?.message,
+      statusCode: error.response?.status,
+    };
+
+
+    console.log("Axios Interceptor Error:", customError);
+    // Handle 401 Unauthorized - redirect to login
+    if (error.response?.status === 401) {
+      localStorage.removeItem(TOKEN_KEY);
+      window.location.href = '/login';
+      return;
+    }
+
+    return Promise.reject(customError);
+  },
+);
+
 const strapiAuthHelper = AuthHelper(API_URL + "/api");
 
 export const authProvider: AuthProvider = {

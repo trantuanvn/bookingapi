@@ -14,6 +14,16 @@ axiosInstance.interceptors.response.use(
       statusCode: error.response?.status,
     };
 
+    // Handle 401 Unauthorized - redirect to login
+    if (error.response?.status === 401) {
+      // Clear any stored authentication data
+      localStorage.removeItem('token');
+      localStorage.removeItem('auth');
+      
+      // Redirect to login page
+      window.location.href = '/login';
+    }
+
     return Promise.reject(customError);
   },
 );
