@@ -312,13 +312,13 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
             >
               <div
                 style={{
-                  textAlign: "center",
+                  textAlign: "left",
                   padding: "8px",
                   width: "200px",
                   borderRight: "1px solid #808080FF",
                 }}
               >
-                {a.name}
+                {a.space?.name} - {a.name}
               </div>
               {[...Array(10).keys()].map((i) => {
                 const time = `${("00" + (i + 8)).slice(-2)}:00`
@@ -345,7 +345,8 @@ const Map = ({ date, bookingItems }: { date: string; bookingItems: any[] }) => {
                           style={{
                             background: "#f50",
                             color: "white",
-                            height: 35,
+                            height: 41,
+                            padding: "10px 0"
                           }}
                         >
                           {a.booking.code}
