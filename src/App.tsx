@@ -1,6 +1,6 @@
-import { Authenticated, NotificationProvider, Refine } from "@refinedev/core";
-import { DevtoolsProvider } from "@refinedev/devtools";
-import { RefineKbarProvider } from "@refinedev/kbar";
+import { Authenticated, NotificationProvider, Refine } from "@refinedev/core"
+import { DevtoolsProvider } from "@refinedev/devtools"
+import { RefineKbarProvider } from "@refinedev/kbar"
 
 import {
   AuthPage,
@@ -8,26 +8,26 @@ import {
   ThemedLayoutV2,
   ThemedSiderV2,
   useNotificationProvider,
-} from "@refinedev/antd";
-import "@refinedev/antd/dist/reset.css";
+} from "@refinedev/antd"
+import "@refinedev/antd/dist/reset.css"
 
 import routerBindings, {
   CatchAllNavigate,
   NavigateToResource,
-} from "@refinedev/react-router-v6";
-import { App as AntdApp, notification, Typography } from "antd";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-import { authProvider, axiosInstance } from "./authProvider";
-import { Header } from "./components/header";
-import { API_URL } from "./constants";
-import { ColorModeContextProvider } from "./contexts/color-mode";
-import { BookingCreate, BookingList, BookingShow } from "./pages/bookings";
-import { UserCreate, UserList, UserShow } from "./pages/user";
-import { DataProvider } from "./dataProvider";
-import { SpaceCreate, SpaceList, SpaceShow } from "./pages/spaces";
-import { useEffect } from "react";
-import { Board } from "./pages/board";
-import "./style.css";
+} from "@refinedev/react-router-v6"
+import { App as AntdApp, notification, Typography } from "antd"
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom"
+import { authProvider, axiosInstance } from "./authProvider"
+import { Header } from "./components/header"
+import { API_URL } from "./constants"
+import { ColorModeContextProvider } from "./contexts/color-mode"
+import { BookingCreate, BookingList, BookingShow } from "./pages/bookings"
+import { UserCreate, UserList, UserShow } from "./pages/user"
+import { DataProvider } from "./dataProvider"
+import { SpaceCreate, SpaceList, SpaceShow } from "./pages/spaces"
+import { useEffect } from "react"
+import { Board } from "./pages/board"
+import "./style.css"
 import {
   ControlFilled,
   GroupOutlined,
@@ -36,38 +36,37 @@ import {
   TableOutlined,
   UsergroupAddOutlined,
   UserOutlined,
-} from "@ant-design/icons";
-import { PostList } from "./pages/post/list";
-import { PlanList } from "./pages/plan/list";
-import { ContactList } from "./pages/contact/list";
-import { FAQList } from "./pages/faq/list";
-import { PlanCreate } from "./pages/plan/create";
-import { PostCreate } from "./pages/post/create";
-import { FAQCreate } from "./pages/faq/create";
+} from "@ant-design/icons"
+import { PostList } from "./pages/post/list"
+import { PlanList } from "./pages/plan/list"
+import { ContactList } from "./pages/contact/list"
+import { FAQList } from "./pages/faq/list"
+import { PlanCreate } from "./pages/plan/create"
+import { PostCreate } from "./pages/post/create"
+import { FAQCreate } from "./pages/faq/create"
 
 function App() {
-  document.title = "LaSpace | Admin";
+  document.title = "LaSpace | Admin"
   useEffect(() => {
-    localStorage.setItem("colorMode", "dark");
-  }, []);
+    localStorage.setItem("colorMode", "dark")
+  }, [])
 
   const notificationProvider: NotificationProvider = {
     open: (e) => {
       notification.open({
-        message: 'Có lỗi xảy ra',
+        message: "Có lỗi xảy ra",
         description: e.description,
         placement: "top",
         // duration: 3,
         type: e.type as any,
-      });
+      })
     },
     close: () => {
-      notification.destroy();
+      notification.destroy()
     },
-  };
+  }
   return (
     <BrowserRouter>
-      {/* <GitHubBanner /> */}
       <RefineKbarProvider>
         <ColorModeContextProvider>
           <AntdApp>
@@ -288,18 +287,13 @@ function App() {
                     />
                   </Route>
                 </Routes>
-
-                {/* <RefineKbar /> */}
-                {/* <UnsavedChangesNotifier /> */}
-                {/* <DocumentTitleHandler /> */}
               </Refine>
-              {/* <DevtoolsPanel /> */}
             </DevtoolsProvider>
           </AntdApp>
         </ColorModeContextProvider>
       </RefineKbarProvider>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App
