@@ -1,4 +1,4 @@
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons"
 import {
   DateField,
   DeleteButton,
@@ -7,12 +7,13 @@ import {
   useModalForm,
   useSelect,
   useTable,
-} from "@refinedev/antd";
-import { useList, useOne, useShow } from "@refinedev/core";
+} from "@refinedev/antd"
+import { useList, useOne, useShow, useUpdate } from "@refinedev/core"
 import {
   Button,
   Card,
   DatePicker,
+  Descriptions,
   Divider,
   Form,
   Input,
@@ -21,31 +22,31 @@ import {
   Space,
   Table,
   Typography,
-} from "antd";
-import dayjs from "dayjs";
-import _ from "lodash";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+} from "antd"
+import dayjs from "dayjs"
+import _ from "lodash"
+import { useEffect } from "react"
+import { useParams } from "react-router-dom"
 
-import weekday from "dayjs/plugin/weekday";
-import localeData from "dayjs/plugin/localeData";
-dayjs.extend(weekday);
-dayjs.extend(localeData);
-dayjs.locale("en");
-dayjs.locale("vi");
+import weekday from "dayjs/plugin/weekday"
+import localeData from "dayjs/plugin/localeData"
+dayjs.extend(weekday)
+dayjs.extend(localeData)
+dayjs.locale("en")
+dayjs.locale("vi")
 
-const { Title } = Typography;
+const { Title } = Typography
 
 export const UserShow = () => {
-  const { id } = useParams();
+  const { id } = useParams()
   const { query } = useShow({
     meta: {
       populate: ["avatar", "role", "currentPlan"],
     },
-  });
-  const { data, isLoading } = query;
+  })
+  const { data, isLoading } = query
 
-  const record = data?.data;
+  const record = data?.data
 
   const { tableProps: tablePropsSubsciption } = useTable({
     resource: "subscriptions",
@@ -67,7 +68,7 @@ export const UserShow = () => {
         order: "desc",
       },
     ],
-  });
+  })
 
   const { tableProps: tablePropsPayment } = useTable({
     resource: "payments",
@@ -81,40 +82,42 @@ export const UserShow = () => {
         },
       ],
     },
-  });
+  })
+
+  const { mutate } = useUpdate()
   const modalFormNew = useModalForm({
     action: "create",
     resource: "subscriptions",
     redirect: false,
-  });
+  })
 
-  const time = Form.useWatch("time", modalFormNew?.formProps?.form);
-  const start = Form.useWatch("start", modalFormNew?.formProps?.form);
+  const time = Form.useWatch("time", modalFormNew?.formProps?.form)
+  const start = Form.useWatch("start", modalFormNew?.formProps?.form)
 
   useEffect(() => {
     if (time && start && modalFormNew?.formProps?.form) {
-      const end = dayjs(start).add(time, "month");
-      modalFormNew.formProps.form.setFieldValue("end", end);
+      const end = dayjs(start).add(time, "month")
+      modalFormNew.formProps.form.setFieldValue("end", end)
     }
-  }, [time, start, modalFormNew?.formProps?.form]);
+  }, [time, start, modalFormNew?.formProps?.form])
 
   const modalFormExpand = useModalForm({
     action: "edit",
     resource: "subscriptions",
     redirect: false,
-  });
+  })
 
-  const timeExpand = Form.useWatch("time", modalFormExpand?.formProps?.form);
-  const startExpand = Form.useWatch("start", modalFormExpand?.formProps?.form);
+  const timeExpand = Form.useWatch("time", modalFormExpand?.formProps?.form)
+  const startExpand = Form.useWatch("start", modalFormExpand?.formProps?.form)
 
   useEffect(() => {
     if (timeExpand && startExpand && modalFormExpand?.formProps?.form) {
-      const end = dayjs(startExpand).add(timeExpand, "month");
-      modalFormExpand.formProps.form.setFieldValue("end", end);
+      const end = dayjs(startExpand).add(timeExpand, "month")
+      modalFormExpand.formProps.form.setFieldValue("end", end)
     }
-  }, [timeExpand, startExpand, modalFormExpand?.formProps?.form]);
+  }, [timeExpand, startExpand, modalFormExpand?.formProps?.form])
 
-  const valuesExpand = modalFormExpand.formProps?.initialValues;
+  const valuesExpand = modalFormExpand.formProps?.initialValues
 
   const modalFormUpgrade = useModalForm({
     action: "edit",
@@ -123,26 +126,29 @@ export const UserShow = () => {
     meta: {
       populate: ["plan"],
     },
-  });
-  const valuesUpgrade = modalFormUpgrade.formProps?.initialValues;
+  })
+  const valuesUpgrade = modalFormUpgrade.formProps?.initialValues
 
   const { selectProps: selectPropsPlan } = useSelect({
     resource: "plans",
     optionLabel: "name",
     optionValue: "documentId",
-  });
+  })
 
   const modalFormPaymentNew = useModalForm({
     action: "create",
     resource: "payments",
     redirect: false,
-  });
+  })
 
   const modalFormPaymentEdit = useModalForm({
     action: "create",
     resource: "payments",
     redirect: false,
-  });
+  })
+
+  const userId = record?.id
+  const currentPlanId = record?.currentPlan?.id
 
   return (
     <Show
@@ -153,7 +159,25 @@ export const UserShow = () => {
     >
       {record && (
         <Card title="Thông tin">
-          <Form
+          <Descriptions title="User Info" bordered size="small" column={1}>
+            <Descriptions.Item label="Tên đăng nhập">
+              {record?.username}
+            </Descriptions.Item>
+            <Descriptions.Item label="Tên đầy đủ">
+              {record?.fullName}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">{record?.email}</Descriptions.Item>
+            <Descriptions.Item label="Số điện thoại">
+              {record?.phoneNumber}
+            </Descriptions.Item>
+            <Descriptions.Item label="Gói dịch vụ hiện tại">
+              {record?.currentPlan?.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Phân quyền">
+              {record?.role?.name}
+            </Descriptions.Item>
+          </Descriptions>
+          {/* <Form
             layout="vertical"
             initialValues={{
               ...record,
@@ -175,7 +199,7 @@ export const UserShow = () => {
             <Form.Item name={["currentPlan", "name"]} label="Gói dịch vụ">
               <Input placeholder="Nhập địa chỉ" />
             </Form.Item>
-          </Form>
+          </Form> */}
         </Card>
       )}
       <br />
@@ -185,17 +209,17 @@ export const UserShow = () => {
           <Button
             type="primary"
             onClick={() => {
-              modalFormNew.show();
+              modalFormNew.show()
               const last = _.last(
                 _.sortBy(tablePropsSubsciption?.dataSource, "end", "asc")
-              );
-              console.log("last", last);
+              )
+              console.log("last", last)
               if (modalFormNew.formProps.form && last) {
-                modalFormNew.formProps.form.setFieldValue("user", id);
+                modalFormNew.formProps.form.setFieldValue("user", id)
                 modalFormNew.formProps.form.setFieldValue(
                   "start",
                   dayjs(last.end || new Date())
-                );
+                )
               }
             }}
           >
@@ -226,10 +250,10 @@ export const UserShow = () => {
               const offsetMonth = dayjs(value).diff(
                 dayjs(record.start),
                 "month"
-              );
-              const offsetYear = dayjs(value).diff(dayjs(record.start), "year");
-              const text = offsetYear > 0 ? offsetYear : offsetMonth;
-              const unit = offsetYear > 0 ? "year" : "month";
+              )
+              const offsetYear = dayjs(value).diff(dayjs(record.start), "year")
+              const text = offsetYear > 0 ? offsetYear : offsetMonth
+              const unit = offsetYear > 0 ? "year" : "month"
               return (
                 <span>
                   <DateField value={value} format="DD/MM/YYYY hh:mm" />
@@ -238,22 +262,10 @@ export const UserShow = () => {
                     : ""}{" "}
                   (gói {text} {unit} )
                 </span>
-              );
+              )
             }}
           />
-          {/* <Table.Column
-            title="Trạng thái"
-            dataIndex="state"
-            render={(value) => (
-              <span>
-                {value === "active" ? (
-                  <span style={{ color: "green" }}>Active</span>
-                ) : (
-                  <span style={{ color: "red" }}>Inactive</span>
-                )}
-              </span>
-            )}
-          /> */}
+
           <Table.Column
             title="Ngày tạo"
             dataIndex="createdAt"
@@ -263,6 +275,7 @@ export const UserShow = () => {
           />
           <Table.Column
             title="Hành động"
+            width={300}
             dataIndex="actions"
             render={(_, record) => {
               return (
@@ -273,12 +286,31 @@ export const UserShow = () => {
                     size="small"
                     recordItemId={record.documentId}
                   />
+                  {record.plan?.id == currentPlanId ? (
+                    <></>
+                  ) : (
+                    <Button
+                      size="small"
+                      type="primary"
+                      onClick={() => {
+                        mutate({
+                          resource: "users",
+                          id: userId,
+                          values: {
+                            currentPlan: record.plan?.id,
+                          },
+                        })
+                      }}
+                    >
+                      Kích hoạt
+                    </Button>
+                  )}
 
                   <Button
                     size="small"
                     type="primary"
                     onClick={() => {
-                      modalFormExpand.show(record.documentId);
+                      modalFormExpand.show(record.documentId)
                     }}
                   >
                     Gia hạn
@@ -287,13 +319,13 @@ export const UserShow = () => {
                     size="small"
                     type="primary"
                     onClick={() => {
-                      modalFormUpgrade.show(record.documentId);
+                      modalFormUpgrade.show(record.documentId)
                     }}
                   >
                     Nâng cấp
                   </Button>
                 </Space>
-              );
+              )
             }}
           />
         </Table>
@@ -305,8 +337,8 @@ export const UserShow = () => {
           <Button
             type="primary"
             onClick={() => {
-              modalFormPaymentNew.show();
-              modalFormPaymentNew?.formProps?.form?.setFieldValue("user", id);
+              modalFormPaymentNew.show()
+              modalFormPaymentNew?.formProps?.form?.setFieldValue("user", id)
             }}
           >
             Thêm thanh toán
@@ -325,15 +357,15 @@ export const UserShow = () => {
             dataIndex="payment_method"
             render={(value) => {
               if (value === "bankTransfer") {
-                return "Chuyển khoản";
+                return "Chuyển khoản"
               }
               if (value === "cash") {
-                return "Tiền mặt";
+                return "Tiền mặt"
               }
               if (value === "creditCard") {
-                return "Thẻ tín dụng";
+                return "Thẻ tín dụng"
               }
-              return value;
+              return value
             }}
           />
           <Table.Column title="Số tiền" dataIndex="amount" />
@@ -342,13 +374,13 @@ export const UserShow = () => {
             dataIndex="state"
             render={(value) => {
               if (value == "completed") {
-                return <span style={{ color: "green" }}>Đã thanh toán</span>;
+                return <span style={{ color: "green" }}>Đã thanh toán</span>
               }
               if (value == "pending") {
-                return <span style={{ color: "orange" }}>Chờ thanh toán</span>;
+                return <span style={{ color: "orange" }}>Chờ thanh toán</span>
               }
               if (value == "failed") {
-                return <span style={{ color: "red" }}>Thất bại</span>;
+                return <span style={{ color: "red" }}>Thất bại</span>
               }
             }}
           />
@@ -381,13 +413,13 @@ export const UserShow = () => {
                     size="small"
                     type="primary"
                     onClick={() => {
-                      modalFormPaymentEdit.show(record.documentId);
+                      modalFormPaymentEdit.show(record.documentId)
                     }}
                   >
                     Chỉnh sửa
                   </Button>
                 </Space>
-              );
+              )
             }}
           />
         </Table>
@@ -857,5 +889,5 @@ export const UserShow = () => {
         </Form>
       </Modal>
     </Show>
-  );
-};
+  )
+}
