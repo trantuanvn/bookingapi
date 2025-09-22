@@ -10,6 +10,7 @@ import {
 import { type BaseRecord, useMany } from "@refinedev/core"
 import { Avatar, Image, Space, Table } from "antd"
 import { API_URL } from "../../constants"
+import _ from "lodash"
 
 export const PostList = () => {
   const { tableProps } = useTable({
@@ -49,11 +50,14 @@ export const PostList = () => {
           dataIndex="images"
           title={"Images"}
           render={(value: any) => (
-            <>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {value?.map((img: any) => (
-                <Image src={API_URL + img.url} height={60} />
+                <Image
+                  src={API_URL + _.get(img, "formats.thumbnail.url")}
+                  height={60}
+                />
               ))}
-            </>
+            </div>
           )}
         />
 
