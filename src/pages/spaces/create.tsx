@@ -1,13 +1,15 @@
-import { Create, useForm, useSelect } from "@refinedev/antd";
-import { Button, Col, Form, Input, InputNumber, Row, Select } from "antd";
-import UploadFile from "../../components/image";
-import { useParams } from "react-router-dom";
-import Editor from "../../components/editor";
-import MDEditor from "@uiw/react-md-editor";
+import { Create, useForm, useSelect } from "@refinedev/antd"
+import { Button, Col, Form, Input, InputNumber, Row, Select } from "antd"
+import UploadFile from "../../components/image"
+import { useParams } from "react-router-dom"
+import Editor from "../../components/editor"
+import MDEditor from "@uiw/react-md-editor"
 
 export const SpaceCreate = () => {
-  const { formProps, saveButtonProps, onFinish } = useForm({});
-  const { id } = useParams();
+  const { formProps, saveButtonProps, onFinish } = useForm({
+    meta: { populate: "*" },
+  })
+  const { id } = useParams()
 
   return (
     <Create
@@ -17,12 +19,13 @@ export const SpaceCreate = () => {
     >
       <Form
         {...formProps}
+
         layout="vertical"
         onFinish={(d: any) => {
-          d.images = d.images?.map((item: any) => item.id);
-          d.thumnail = d.thumnail?.id;
+          d.images = d.images?.map((item: any) => item.id)
+          d.thumnail = d.thumnail?.id
           if (formProps.onFinish) {
-            formProps.onFinish(d);
+            formProps.onFinish(d)
           }
         }}
       >
@@ -109,5 +112,5 @@ export const SpaceCreate = () => {
         </Row>
       </Form>
     </Create>
-  );
-};
+  )
+}

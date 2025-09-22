@@ -3,6 +3,7 @@ import { Button, Image, Upload } from "antd"
 import { get } from "lodash"
 // import nookies from "nookies";
 import { API_URL, TOKEN_KEY } from "../constants"
+import { DeleteOutlined } from "@ant-design/icons"
 
 export default function UploadFile({
   value,
@@ -15,7 +16,8 @@ export default function UploadFile({
   const fileList: any[] = []
 
   if (multiple) {
-    ;(value || []).forEach((v: any) => {
+    const l = value || []
+    l.forEach((v: any) => {
       fileList.push({
         uid: v.id,
         name: v.name,
@@ -91,18 +93,34 @@ export default function UploadFile({
         )}
       </Upload>
 
-      {fileList.map((f) => (
-        <div key={f.uid}>
-          <Image src={f.url} height={60} />
-          <Button
-            onClick={() => {
-              onChange && onChange(null)
-            }}
-          >
-            Xóa
-          </Button>
-        </div>
-      ))}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+        {fileList.map((f) => (
+          <div key={f.uid} style={{ position: "relative" }}>
+            <Image src={f.url} height={60} />
+            <div style={{ position: "absolute", top: 0, right: 0 }}>
+              <Button
+                onClick={() => {
+                  if (multiple) {
+                    const out = (value || []).filter((i: any) => i.id !== f.uid)
+                    onChange && onChange(out)
+                  } else {
+                    onChange && onChange(null)
+                  }
+                }}
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+                style={{
+                  padding: "0 4px",
+                  lineHeight: "12px",
+                  height: 16,
+                  minWidth: 16,
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

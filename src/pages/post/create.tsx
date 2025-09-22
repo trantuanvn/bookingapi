@@ -1,22 +1,34 @@
 import { Create, useForm, useSelect } from "@refinedev/antd"
 import MDEditor from "@uiw/react-md-editor"
-import { Col, DatePicker, Form, Input, Row, Select } from "antd"
+import { Button, Col, DatePicker, Form, Input, Row, Select } from "antd"
 import dayjs from "dayjs"
 import UploadFile from "../../components/image"
 
 export const PostCreate = () => {
-  const { formProps, saveButtonProps } = useForm({})
+  const { formProps, saveButtonProps } = useForm({
+    meta: {
+      populate: "*",
+    },
+  })
 
   return (
     <Create saveButtonProps={saveButtonProps} breadcrumb={null}>
       <Form
         {...formProps}
+        initialValues={{
+          ...formProps?.initialValues,
+          imageList: formProps?.initialValues?.images || [],
+          bannerImage: formProps?.initialValues?.banner || null,
+        }}
         layout="vertical"
         onFinish={(values: any) => {
           if (values.bannerImage) {
             values.banner = values.bannerImage.id
           }
-          values.images = (values.images || []).map((i: any) => i.id)
+          if (values.imageList) {
+            values.images = (values.imageList || []).map((i: any) => i.id)
+          }
+          delete values.imageList
           delete values.bannerImage
           formProps?.onFinish?.(values)
         }}
@@ -78,29 +90,17 @@ export const PostCreate = () => {
           </Col>
 
           <Col span={12}>
-            <Form.Item
-              label={"Banner"}
-              name={["bannerImage"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <UploadFile />
+            <Form.Item label={"Banner"} name={["bannerImage"]}>
+              <UploadFile multiple>
+                <Button>Chọn ảnh</Button>
+              </UploadFile>
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item
-              label={"Images"}
-              name={["images"]}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <UploadFile multiple />
+            <Form.Item label={"Images"} name={["imageList"]}>
+              <UploadFile multiple>
+                <Button>Chọn ảnh</Button>
+              </UploadFile>
             </Form.Item>
           </Col>
         </Row>
