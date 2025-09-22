@@ -1,11 +1,11 @@
-import { Create, useForm, useSelect } from "@refinedev/antd";
-import MDEditor from "@uiw/react-md-editor";
-import { Col, DatePicker, Form, Input, Row, Select } from "antd";
-import dayjs from "dayjs";
-import UploadFile from "../../components/image";
+import { Create, useForm, useSelect } from "@refinedev/antd"
+import MDEditor from "@uiw/react-md-editor"
+import { Col, DatePicker, Form, Input, Row, Select } from "antd"
+import dayjs from "dayjs"
+import UploadFile from "../../components/image"
 
 export const PostCreate = () => {
-  const { formProps, saveButtonProps } = useForm({});
+  const { formProps, saveButtonProps } = useForm({})
 
   return (
     <Create saveButtonProps={saveButtonProps} breadcrumb={null}>
@@ -14,10 +14,11 @@ export const PostCreate = () => {
         layout="vertical"
         onFinish={(values: any) => {
           if (values.bannerImage) {
-            values.banner = values.bannerImage.id;
+            values.banner = values.bannerImage.id
           }
-          delete values.bannerImage;
-          formProps?.onFinish?.(values);
+          values.images = (values.images || []).map((i: any) => i.id)
+          delete values.bannerImage
+          formProps?.onFinish?.(values)
         }}
       >
         <Row gutter={12}>
@@ -76,7 +77,7 @@ export const PostCreate = () => {
             </Form.Item>
           </Col>
 
-          <Col span={24}>
+          <Col span={12}>
             <Form.Item
               label={"Banner"}
               name={["bannerImage"]}
@@ -89,8 +90,21 @@ export const PostCreate = () => {
               <UploadFile />
             </Form.Item>
           </Col>
+          <Col span={12}>
+            <Form.Item
+              label={"Images"}
+              name={["images"]}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <UploadFile multiple />
+            </Form.Item>
+          </Col>
         </Row>
       </Form>
     </Create>
-  );
-};
+  )
+}

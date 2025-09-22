@@ -1,8 +1,8 @@
-import { ImageField } from "@refinedev/antd";
-import { Button, Image, Upload } from "antd";
-import { get } from "lodash";
+import { ImageField } from "@refinedev/antd"
+import { Button, Image, Upload } from "antd"
+import { get } from "lodash"
 // import nookies from "nookies";
-import { API_URL, TOKEN_KEY } from "../constants";
+import { API_URL, TOKEN_KEY } from "../constants"
 
 export default function UploadFile({
   value,
@@ -12,18 +12,18 @@ export default function UploadFile({
   onDone,
 }: any) {
   // const cookies = nookies.get();
-  const fileList: any[] = [];
+  const fileList: any[] = []
 
   if (multiple) {
-    (value || []).forEach((v: any) => {
+    ;(value || []).forEach((v: any) => {
       fileList.push({
         uid: v.id,
         name: v.name,
         status: "done",
         url: API_URL + v.url,
         response: [v],
-      });
-    });
+      })
+    })
   } else {
     if (value) {
       fileList.push({
@@ -32,7 +32,7 @@ export default function UploadFile({
         status: "done",
         url: API_URL + value.url,
         response: [value],
-      });
+      })
     }
   }
   return (
@@ -51,24 +51,24 @@ export default function UploadFile({
         showUploadList={false}
         accept="image/*"
         onChange={(e) => {
-          console.log(e);
+          console.log(e)
           if (multiple) {
-            const v = get(e, "fileList") as any;
+            const v = get(e, "fileList") as any
             if (v) {
               const out = v
                 .filter((r: any) => r.response)
-                .map((i: any) => i.response[0]);
-              onChange && onChange(out);
+                .map((i: any) => i.response[0])
+              onChange && onChange(out)
               if (out.length > 0) {
-                onDone && onDone(out);
+                onDone && onDone(out)
               }
             }
-            return;
+            return
           } else {
-            const v = get(e, "file.response[0]");
+            const v = get(e, "file.response[0]")
             if (v) {
-              onChange && onChange(v);
-              onDone && onDone(v);
+              onChange && onChange(v)
+              onDone && onDone(v)
             }
           }
         }}
@@ -96,7 +96,7 @@ export default function UploadFile({
           <Image src={f.url} height={60} />
           <Button
             onClick={() => {
-              onChange && onChange(null);
+              onChange && onChange(null)
             }}
           >
             Xóa
@@ -104,5 +104,5 @@ export default function UploadFile({
         </div>
       ))}
     </div>
-  );
+  )
 }

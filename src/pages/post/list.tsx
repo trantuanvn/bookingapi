@@ -6,10 +6,10 @@ import {
   MarkdownField,
   ShowButton,
   useTable,
-} from "@refinedev/antd";
-import { type BaseRecord, useMany } from "@refinedev/core";
-import { Avatar, Image, Space, Table } from "antd";
-import { API_URL } from "../../constants";
+} from "@refinedev/antd"
+import { type BaseRecord, useMany } from "@refinedev/core"
+import { Avatar, Image, Space, Table } from "antd"
+import { API_URL } from "../../constants"
 
 export const PostList = () => {
   const { tableProps } = useTable({
@@ -25,7 +25,7 @@ export const PostList = () => {
         },
       ],
     },
-  });
+  })
 
   return (
     <List breadcrumb={null}>
@@ -43,6 +43,17 @@ export const PostList = () => {
           title={"Banner"}
           render={(value: any) => (
             <Image src={API_URL + value.url} height={60} />
+          )}
+        />
+        <Table.Column
+          dataIndex="images"
+          title={"Images"}
+          render={(value: any) => (
+            <>
+              {value?.map((img: any) => (
+                <Image src={API_URL + img.url} height={60} />
+              ))}
+            </>
           )}
         />
 
@@ -73,5 +84,5 @@ export const PostList = () => {
         />
       </Table>
     </List>
-  );
-};
+  )
+}
